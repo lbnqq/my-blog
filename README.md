@@ -32,14 +32,26 @@ http://127.0.0.1:8000/
 复制 `.env.example` 为 `.env`，填写 Supabase PostgreSQL 连接信息：
 
 ```text
-SUPABASE_DB_NAME=
-SUPABASE_DB_USER=
+SUPABASE_DB_NAME=postgres
+SUPABASE_DB_USER=postgres
 SUPABASE_DB_PASSWORD=
-SUPABASE_DB_HOST=
+SUPABASE_DB_HOST=db.bbfoajvzijbvlvsjvsvb.supabase.co
 SUPABASE_DB_PORT=5432
+SUPABASE_DB_SSLMODE=require
 ```
 
 如果 `SUPABASE_DB_HOST` 留空，项目会使用本地 SQLite，方便开发和演示。
+
+当前 Supabase 项目：
+
+```text
+Project name: movie-blog-recommender
+Project ref: bbfoajvzijbvlvsjvsvb
+Region: ap-southeast-1
+API URL: https://bbfoajvzijbvlvsjvsvb.supabase.co
+```
+
+数据库密码不会提交到仓库。请在 Supabase Dashboard 的 Project Settings -> Database -> Connection string 中复制数据库密码，填入本地 `.env` 的 `SUPABASE_DB_PASSWORD`。
 
 ## 测试
 
