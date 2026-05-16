@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}选择电影类型{% endblock %}
+
+{% block content %}
+<h1>选择你偏好的电影类型</h1>
+<p class="lead">先选一个大方向，系统会展示对应的代表电影评分表。</p>
+<form method="post" class="grid">
+    {% csrf_token %}
+    {% for value, label in form.fields.category.choices %}
+        <label class="card choice-card">
+            <input type="radio" name="category" value="{{ value }}" required>
+            <strong>{{ label }}</strong>
+        </label>
+    {% endfor %}
+    <div class="form-actions">
+        <button class="primary" type="submit">进入评分表</button>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}电影推荐博客{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <p class="eyebrow">Django + Supabase + TaskCF</p>
+        <h1>电影推荐博客</h1>
+        <p class="lead">先选择你偏好的电影类型，再给代表电影打分，系统会从豆瓣 Top1000 中推荐最适合你的 20 部电影。</p>
+        <a class="button primary" href="{% url 'ratings:category' %}">开始推荐</a>
+    </div>
+</section>
+{% endblock %}

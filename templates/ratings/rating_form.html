@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}电影评分表{% endblock %}
+
+{% block content %}
+<h1>{{ category_label }}电影评分表</h1>
+<p class="lead">请评价你看过或了解的电影，至少评价 8 部后提交。</p>
+
+{% if not rating_form %}
+    <p class="message">当前分类还没有评分表，请先导入电影数据。</p>
+{% else %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="movie-list">
+            {% for item in form_movies %}
+                <article class="card movie-card">
+                    <div>
+                        <h2>{{ item.movie.title }}</h2>
+                        <p>{{ item.movie.year }} · {{ item.movie.genres|join:" / " }} · 豆瓣 {{ item.movie.rating }}</p>
+                        <p>{{ item.movie.summary }}</p>
+                    </div>
+                    <div class="rating-row">
+                        {% for value in rating_values %}
+                            <label>
+                                <input type="radio" name="movie_{{ item.movie.id }}" value="{{ value }}">
+                                {{ value }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="form-actions">
+            <button class="primary" type="submit">提交评分并生成推荐</button>
+        </div>
+    </form>
+{% endif %}
+{% endblock %}
