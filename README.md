@@ -33,7 +33,7 @@ http://127.0.0.1:8000/
 
 ```text
 SUPABASE_DB_NAME=postgres
-SUPABASE_DB_USER=postgres
+SUPABASE_DB_USER=movie_blog_django
 SUPABASE_DB_PASSWORD=
 SUPABASE_DB_HOST=db.bbfoajvzijbvlvsjvsvb.supabase.co
 SUPABASE_DB_PORT=5432
@@ -51,7 +51,7 @@ Region: ap-southeast-1
 API URL: https://bbfoajvzijbvlvsjvsvb.supabase.co
 ```
 
-数据库密码不会提交到仓库。请在 Supabase Dashboard 的 Project Settings -> Database -> Connection string 中复制数据库密码，填入本地 `.env` 的 `SUPABASE_DB_PASSWORD`。
+数据库密码不会提交到仓库。本项目已创建 Django 专用数据库用户 `movie_blog_django`，本地 `.env` 的 `SUPABASE_DB_PASSWORD` 填写该用户密码。
 
 ## 测试
 
