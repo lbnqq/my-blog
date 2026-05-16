@@ -1,0 +1,6 @@
+main_category,category_name,recommended_genres,secondary_genres,feature_tag_examples,form_strategy
+suspense_crime,Suspense / Crime,悬疑;犯罪;惊悚;推理,剧情;黑色电影,反转;烧脑;探案;黑帮;心理,优先选择高分且题材差异明显的悬疑/犯罪片
+romance_drama,Romance / Drama,爱情;剧情;文艺;青春,家庭;同性;音乐,人生;成长;亲情;时代;治愈,优先选择情绪表达和人物关系差异明显的剧情/爱情片
+comedy_animation,Comedy / Animation,喜剧;动画;儿童,家庭;奇幻;冒险,幽默;温暖;童年;治愈;合家欢,优先选择喜剧、动画、家庭向代表片
+sci_fi_action,Sci-Fi / Action / Adventure,科幻;动作;冒险;奇幻,灾难;武侠;运动,宇宙;超级英雄;热血;史诗;视觉,优先选择动作强度和世界观差异明显的影片
+history_war_biography,History / War / Biography,历史;战争;传记;纪录片,剧情;古装,真实事件;二战;人物传记;时代;社会,优先选择历史背景和人物主题差异明显的影片

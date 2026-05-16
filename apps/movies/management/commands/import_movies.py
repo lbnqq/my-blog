@@ -5,9 +5,9 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from apps.movies.models import Movie
-from apps.movies.services.classifier import CATEGORY_LABELS, classify_main_category, normalize_category
+from apps.movies.services.classifier import classify_main_category, normalize_category
 from apps.movies.services.feature_builder import build_feature_tags, split_semicolon_text
-from apps.ratings.models import RatingForm, RatingFormMovie
+from apps.ratings.services.rating_form_builder import rebuild_all_rating_forms
 
 
 class Command(BaseCommand):
@@ -26,10 +26,10 @@ class Command(BaseCommand):
         with csv_path.open("r", encoding="utf-8-sig", newline="") as csv_file:
             reader = csv.DictReader(csv_file)
             for row in reader:
-                movie = self.import_row(row)
+                self.import_row(row)
                 imported += 1
-                self.link_rating_form(movie)
 
+        rebuild_all_rating_forms()
         self.stdout.write(self.style.SUCCESS(f"Imported {imported} movies."))
 
     def import_row(self, row):
@@ -80,19 +80,3 @@ class Command(BaseCommand):
             defaults=defaults,
         )
         return movie
-
-    def link_rating_form(self, movie):
-        form, _created = RatingForm.objects.get_or_create(
-            category=movie.main_category,
-            defaults={
-                "title": f"{CATEGORY_LABELS[movie.main_category]}电影评分表",
-                "description": f"根据你对{CATEGORY_LABELS[movie.main_category]}类电影的评分生成推荐。",
-            },
-        )
-        current_count = form.form_movies.count()
-        if current_count < 20:
-            RatingFormMovie.objects.get_or_create(
-                form=form,
-                movie=movie,
-                defaults={"sort_order": current_count + 1, "is_required": current_count < 8},
-            )
