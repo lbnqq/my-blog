@@ -8,10 +8,10 @@ CATEGORY_LABELS = {
 
 CATEGORY_KEYWORDS = {
     "suspense_crime": {"悬疑", "犯罪", "惊悚", "推理", "黑色电影"},
-    "romance_drama": {"爱情", "剧情", "文艺", "青春", "家庭"},
+    "romance_drama": {"爱情", "剧情", "文艺", "青春", "家庭", "同性"},
     "comedy_animation": {"喜剧", "动画", "儿童", "家庭", "治愈"},
-    "sci_fi_action": {"科幻", "动作", "冒险", "奇幻", "灾难"},
-    "history_war_biography": {"历史", "战争", "传记", "纪录片"},
+    "sci_fi_action": {"科幻", "动作", "冒险", "奇幻", "灾难", "武侠"},
+    "history_war_biography": {"历史", "战争", "传记", "纪录片", "古装"},
 }
 
 

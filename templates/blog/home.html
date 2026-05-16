@@ -5,14 +5,17 @@
 {% block content %}
 <section class="hero">
     <div class="hero-panel">
-        <p class="eyebrow">Top1000 / TaskCF / Archive</p>
-        <h1>给你的下一部电影，一个安静的答案。</h1>
-        <p class="lead">从五种电影气质里选一个方向，再评价几部代表作。系统会用优化协同过滤算法，从豆瓣 Top1000 中挑出更可能适合你的 20 部电影。</p>
+        <p class="eyebrow">Douban Top1000 / TaskCF</p>
+        <h1>从一组评分里，找到下一部适合你的电影。</h1>
+        <p class="lead">
+            先选择你偏好的电影类型，再给代表电影打分。系统会结合类型偏好、电影相似度、豆瓣评分和热度，
+            从 1000 部真实豆瓣电影数据中生成 Top20 推荐片单。
+        </p>
         <a class="button primary" href="{% url 'ratings:category' %}">开始推荐</a>
     </div>
     <aside class="archive-card">
-        <div class="number">20</div>
-        <p>每次推荐保留 20 部结果，并附上简短理由。像翻阅一份小型电影馆片单，不喧哗，但有线索。</p>
+        <div class="number">1000</div>
+        <p>电影数据来自公开豆瓣电影数据集，已整理为五类评分表。每次推荐会返回 20 部候选电影，并给出简短推荐理由。</p>
     </aside>
 </section>
 {% endblock %}

@@ -11,15 +11,55 @@ from apps.ratings.models import RatingForm, RatingFormMovie
 
 
 class ImportMoviesTests(TestCase):
+    def write_csv(self, rows):
+        temp_dir = TemporaryDirectory()
+        self.addCleanup(temp_dir.cleanup)
+        csv_path = Path(temp_dir.name) / "movies.csv"
+        with csv_path.open("w", encoding="utf-8", newline="") as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=REQUIRED_HEADERS)
+            writer.writeheader()
+            writer.writerows(rows)
+        return csv_path
+
+    def movie_row(self, index, category, genres):
+        return {
+            "douban_id": f"movie-{index}",
+            "title": f"测试电影{index}",
+            "original_title": "",
+            "year": str(1990 + index),
+            "directors": f"导演{index}",
+            "actors": f"演员{index}",
+            "genres": genres,
+            "countries": "中国",
+            "rating": "8.8",
+            "rating_count": "100000",
+            "rank": str(index),
+            "poster_url": "",
+            "summary": "测试电影简介。",
+            "main_category": category,
+            "feature_tags": f"{genres};高分",
+        }
+
     def test_import_movies_creates_movies_forms_and_links(self):
-        sample_path = Path("data/samples/sample_movies.csv")
+        categories = [
+            ("suspense_crime", "剧情;犯罪;悬疑"),
+            ("romance_drama", "剧情;爱情"),
+            ("comedy_animation", "喜剧;动画"),
+            ("sci_fi_action", "科幻;动作;冒险"),
+            ("history_war_biography", "历史;战争;传记"),
+        ]
+        rows = []
+        for category_index, (category, genres) in enumerate(categories):
+            for offset in range(5):
+                rows.append(self.movie_row(category_index * 5 + offset + 1, category, genres))
+        csv_path = self.write_csv(rows)
 
-        call_command("import_movies", str(sample_path))
+        call_command("import_movies", str(csv_path))
 
-        self.assertGreaterEqual(Movie.objects.count(), 25)
+        self.assertEqual(Movie.objects.count(), 25)
         self.assertEqual(RatingForm.objects.count(), 5)
         self.assertGreater(RatingFormMovie.objects.count(), 0)
-        movie = Movie.objects.get(douban_id="3541415")
+        movie = Movie.objects.get(douban_id="movie-1")
         self.assertEqual(movie.main_category, "suspense_crime")
         self.assertIn("悬疑", movie.feature_tags)
 
@@ -40,32 +80,29 @@ class ImportMoviesTests(TestCase):
             main_category="romance_drama",
             feature_tags=["剧情"],
         )
-        with TemporaryDirectory() as temp_dir:
-            csv_path = Path(temp_dir) / "same_movie.csv"
-            with csv_path.open("w", encoding="utf-8", newline="") as csv_file:
-                writer = csv.DictWriter(csv_file, fieldnames=REQUIRED_HEADERS)
-                writer.writeheader()
-                writer.writerow(
-                    {
-                        "douban_id": "1292052",
-                        "title": "Same Movie",
-                        "original_title": "",
-                        "year": "1994",
-                        "directors": "Director",
-                        "actors": "Actor",
-                        "genres": "剧情;犯罪",
-                        "countries": "美国",
-                        "rating": "9.7",
-                        "rating_count": "3000000",
-                        "rank": "1",
-                        "poster_url": "",
-                        "summary": "New summary.",
-                        "main_category": "suspense_crime",
-                        "feature_tags": "剧情;犯罪;高分",
-                    }
-                )
+        csv_path = self.write_csv(
+            [
+                {
+                    "douban_id": "1292052",
+                    "title": "Same Movie",
+                    "original_title": "",
+                    "year": "1994",
+                    "directors": "Director",
+                    "actors": "Actor",
+                    "genres": "剧情;犯罪",
+                    "countries": "美国",
+                    "rating": "9.7",
+                    "rating_count": "3000000",
+                    "rank": "1",
+                    "poster_url": "",
+                    "summary": "New summary.",
+                    "main_category": "suspense_crime",
+                    "feature_tags": "剧情;犯罪;高分",
+                }
+            ]
+        )
 
-            call_command("import_movies", str(csv_path))
+        call_command("import_movies", str(csv_path))
 
         self.assertEqual(Movie.objects.count(), 1)
         movie = Movie.objects.get(title="Same Movie", year=1994)

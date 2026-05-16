@@ -12,4 +12,4 @@ def generate_reason(movie_title, source_titles, shared_tags, category_label, dou
         parts.append("同时它在豆瓣评分较高，口碑稳定")
     if not parts:
         return f"《{movie_title}》与你的评分偏好较接近。"
-    return "，".join(parts) + "。"
+    return "；".join(parts) + "。"

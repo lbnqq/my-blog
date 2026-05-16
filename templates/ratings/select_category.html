@@ -6,7 +6,7 @@
 <section class="page-heading">
     <p class="kicker">Step 01</p>
     <h1>先选一种电影气质。</h1>
-    <p class="lead">这一步像在资料馆里选一个片架。系统会根据你的选择，展示更适合评分的代表电影。</p>
+    <p class="lead">系统会根据你的选择，展示更适合评分的代表电影，让推荐从一开始就更贴近你的偏好。</p>
 </section>
 
 <form method="post" class="grid">
@@ -15,7 +15,7 @@
         <label class="card choice-card">
             <input type="radio" name="category" value="{{ value }}" required>
             <strong>{{ label }}</strong>
-            <span>选择后进入对应评分表。</span>
+            <span>进入对应评分表，至少评价 8 部电影后生成推荐。</span>
         </label>
     {% endfor %}
     <div class="form-actions">
