@@ -3,20 +3,23 @@
 {% block title %}推荐结果{% endblock %}
 
 {% block content %}
-<h1>为你推荐的电影</h1>
-<p class="lead">根据你选择的 {{ category_label }} 偏好和评分结果，系统生成以下推荐。</p>
+<section class="page-heading">
+    <p class="kicker">Step 03</p>
+    <h1>为你整理好的片单。</h1>
+    <p class="lead">根据你选择的 {{ category_label }} 偏好和评分结果，系统生成以下推荐。</p>
+</section>
 
 {% if results %}
     <div class="movie-list">
         {% for result in results %}
             <article class="card movie-card">
-                <div class="rank">#{{ result.rank_order }}</div>
                 <div>
                     <h2>{{ result.movie.title }}</h2>
-                    <p>{{ result.movie.year }} · {{ result.movie.genres|join:" / " }} · 豆瓣 {{ result.movie.rating }}</p>
+                    <p class="meta">{{ result.movie.year }} · {{ result.movie.genres|join:" / " }} · 豆瓣 {{ result.movie.rating }}</p>
                     <p>{{ result.reason }}</p>
                     <p class="score">推荐得分：{{ result.score|floatformat:3 }}</p>
                 </div>
+                <div class="rank">#{{ result.rank_order|stringformat:"02d" }}</div>
             </article>
         {% endfor %}
     </div>
@@ -25,7 +28,7 @@
 {% endif %}
 
 <p class="form-actions">
-    <a class="button" href="{% url 'ratings:category' %}">重新测试</a>
+    <a class="button primary" href="{% url 'ratings:category' %}">重新测试</a>
     <a class="button" href="{% url 'blog:home' %}">返回首页</a>
 </p>
 {% endblock %}

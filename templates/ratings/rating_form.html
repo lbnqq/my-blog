@@ -3,8 +3,11 @@
 {% block title %}电影评分表{% endblock %}
 
 {% block content %}
-<h1>{{ category_label }}电影评分表</h1>
-<p class="lead">请评价你看过或了解的电影，至少评价 8 部后提交。</p>
+<section class="page-heading">
+    <p class="kicker">Step 02</p>
+    <h1>{{ category_label }}评分表</h1>
+    <p class="lead">请评价你看过或了解的电影。至少评价 8 部后提交，没看过的可以留空。</p>
+</section>
 
 {% if not rating_form %}
     <p class="message">当前分类还没有评分表，请先导入电影数据。</p>
@@ -16,10 +19,10 @@
                 <article class="card movie-card">
                     <div>
                         <h2>{{ item.movie.title }}</h2>
-                        <p>{{ item.movie.year }} · {{ item.movie.genres|join:" / " }} · 豆瓣 {{ item.movie.rating }}</p>
+                        <p class="meta">{{ item.movie.year }} · {{ item.movie.genres|join:" / " }} · 豆瓣 {{ item.movie.rating }}</p>
                         <p>{{ item.movie.summary }}</p>
                     </div>
-                    <div class="rating-row">
+                    <div class="rating-row" aria-label="{{ item.movie.title }}评分">
                         {% for value in rating_values %}
                             <label>
                                 <input type="radio" name="movie_{{ item.movie.id }}" value="{{ value }}">
@@ -31,7 +34,7 @@
             {% endfor %}
         </div>
         <div class="form-actions">
-            <button class="primary" type="submit">提交评分并生成推荐</button>
+            <button class="primary" type="submit">生成推荐片单</button>
         </div>
     </form>
 {% endif %}

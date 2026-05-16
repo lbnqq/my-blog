@@ -61,7 +61,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-if os.getenv("SUPABASE_DB_HOST"):
+USE_SQLITE = os.getenv("USE_SQLITE", "").lower() in {"1", "true", "yes", "on"}
+
+if os.getenv("SUPABASE_DB_HOST") and not USE_SQLITE:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

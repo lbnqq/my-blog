@@ -4,11 +4,15 @@
 
 {% block content %}
 <section class="hero">
-    <div>
-        <p class="eyebrow">Django + Supabase + TaskCF</p>
-        <h1>电影推荐博客</h1>
-        <p class="lead">先选择你偏好的电影类型，再给代表电影打分，系统会从豆瓣 Top1000 中推荐最适合你的 20 部电影。</p>
+    <div class="hero-panel">
+        <p class="eyebrow">Top1000 / TaskCF / Archive</p>
+        <h1>给你的下一部电影，一个安静的答案。</h1>
+        <p class="lead">从五种电影气质里选一个方向，再评价几部代表作。系统会用优化协同过滤算法，从豆瓣 Top1000 中挑出更可能适合你的 20 部电影。</p>
         <a class="button primary" href="{% url 'ratings:category' %}">开始推荐</a>
     </div>
+    <aside class="archive-card">
+        <div class="number">20</div>
+        <p>每次推荐保留 20 部结果，并附上简短理由。像翻阅一份小型电影馆片单，不喧哗，但有线索。</p>
+    </aside>
 </section>
 {% endblock %}

@@ -42,6 +42,12 @@ SUPABASE_DB_SSLMODE=require
 
 如果 `SUPABASE_DB_HOST` 留空，项目会使用本地 SQLite，方便开发和演示。
 
+如果已经配置了 Supabase，但想临时用 SQLite 跑本地测试，可以设置：
+
+```bash
+USE_SQLITE=1
+```
+
 当前 Supabase 项目：
 
 ```text

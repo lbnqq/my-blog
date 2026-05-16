@@ -3,14 +3,19 @@
 {% block title %}选择电影类型{% endblock %}
 
 {% block content %}
-<h1>选择你偏好的电影类型</h1>
-<p class="lead">先选一个大方向，系统会展示对应的代表电影评分表。</p>
+<section class="page-heading">
+    <p class="kicker">Step 01</p>
+    <h1>先选一种电影气质。</h1>
+    <p class="lead">这一步像在资料馆里选一个片架。系统会根据你的选择，展示更适合评分的代表电影。</p>
+</section>
+
 <form method="post" class="grid">
     {% csrf_token %}
     {% for value, label in form.fields.category.choices %}
         <label class="card choice-card">
             <input type="radio" name="category" value="{{ value }}" required>
             <strong>{{ label }}</strong>
+            <span>选择后进入对应评分表。</span>
         </label>
     {% endfor %}
     <div class="form-actions">
