@@ -68,10 +68,15 @@ class Command(BaseCommand):
             raise CommandError("Movie title is required.")
 
         if douban_id:
-            movie, _created = Movie.objects.update_or_create(
-                douban_id=douban_id,
-                defaults={"title": title, **defaults},
-            )
+            movie = Movie.objects.filter(douban_id=douban_id).first()
+            if movie is None:
+                movie = Movie.objects.filter(title=title, year=defaults["year"]).first()
+            if movie is not None:
+                for field, value in {"douban_id": douban_id, "title": title, **defaults}.items():
+                    setattr(movie, field, value)
+                movie.save()
+            else:
+                movie = Movie.objects.create(douban_id=douban_id, title=title, **defaults)
             return movie
 
         movie, _created = Movie.objects.update_or_create(

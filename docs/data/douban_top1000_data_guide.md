@@ -82,3 +82,22 @@ python manage.py import_movies data/imports/douban_top1000_import.csv
 5. Fill missing summaries, directors, actors, countries, and rating counts.
 6. Run the final validator.
 7. Import into Django/Supabase.
+
+## Current Import File Source
+
+The current `data/imports/douban_top1000_import.csv` was generated from the public
+`dengfuping/douban-movies-spider` dataset. The build script keeps the dataset's
+Douban Top250 ordering first, then fills the remaining rows by Douban rating and
+rating count until 1000 valid movies are selected.
+
+Rebuild command:
+
+```bash
+python scripts/build_douban_top1000_import.py <source-data-dir> --output data/imports/douban_top1000_import.csv --limit 1000
+```
+
+After rebuilding, always run:
+
+```bash
+python manage.py validate_movie_csv data/imports/douban_top1000_import.csv --expect-count 1000
+```
