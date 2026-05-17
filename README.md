@@ -77,6 +77,14 @@ python manage.py check
 python manage.py test
 ```
 
+## Render 部署
+
+本项目已准备好使用 Render 免费档运行 Django，并继续连接 Supabase PostgreSQL。部署说明见：
+
+```text
+docs/deployment_render.md
+```
+
 ## 项目流程
 
 1. 用户访问首页。
