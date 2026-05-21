@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="不说话的爱 poster">
+  <rect width="600" height="900" fill="#fffdf9"/>
+  <rect x="42" y="42" width="516" height="816" fill="#f4f1eb" stroke="#c8bdae" stroke-width="3"/>
+  <path d="M300 250c-58-72-160-18-124 74 24 60 124 130 124 130s100-70 124-130c36-92-66-146-124-74z" fill="#6f2f28" opacity=".82"/>
+  <text x="72" y="560" fill="#211c1a" font-family="Microsoft YaHei, Arial, sans-serif" font-size="64" font-weight="800">不说话的爱</text>
+  <text x="78" y="638" fill="#6f6b63" font-family="Arial, sans-serif" font-size="28">ROMANCE / DRAMA</text>
+</svg>

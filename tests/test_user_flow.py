@@ -38,7 +38,8 @@ class UserFlowTests(TestCase):
     def test_home_page_loads(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "电影推荐博客")
+        self.assertContains(response, "电影资料馆")
+        self.assertContains(response, "个性化推荐")
 
     def test_category_page_lists_five_categories(self):
         response = self.client.get(reverse("ratings:category"))

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="时间之子 poster">
+  <rect width="600" height="900" fill="#f4f1eb"/>
+  <rect x="42" y="42" width="516" height="816" fill="#fffdf9" stroke="#c8bdae" stroke-width="3"/>
+  <circle cx="300" cy="250" r="110" fill="#9b6a32" opacity=".26"/>
+  <circle cx="300" cy="250" r="64" fill="none" stroke="#6f2f28" stroke-width="10"/>
+  <text x="96" y="500" fill="#211c1a" font-family="Microsoft YaHei, Arial, sans-serif" font-size="72" font-weight="800">时间之子</text>
+  <text x="100" y="580" fill="#6f6b63" font-family="Arial, sans-serif" font-size="28">COMEDY / FAMILY</text>
+</svg>

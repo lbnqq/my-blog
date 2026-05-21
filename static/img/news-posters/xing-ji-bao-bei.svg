@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="星际宝贝史迪奇 poster">
+  <rect width="600" height="900" fill="#20272a"/>
+  <rect x="42" y="42" width="516" height="816" fill="none" stroke="#c8bdae" stroke-width="3"/>
+  <circle cx="160" cy="160" r="3" fill="#fffdf9"/>
+  <circle cx="410" cy="210" r="4" fill="#fffdf9"/>
+  <circle cx="315" cy="120" r="2" fill="#fffdf9"/>
+  <path d="M86 632c118-96 236-96 428 0" fill="none" stroke="#9b6a32" stroke-width="10"/>
+  <text x="72" y="430" fill="#fffdf9" font-family="Microsoft YaHei, Arial, sans-serif" font-size="56" font-weight="800">星际宝贝史迪奇</text>
+  <text x="78" y="510" fill="#c8bdae" font-family="Arial, sans-serif" font-size="28">ANIMATION / ADVENTURE</text>
+</svg>

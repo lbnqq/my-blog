@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ news.title }} - 电影资料馆{% endblock %}
+
+{% block content %}
+<article class="news-detail">
+    <div class="news-detail-copy">
+        <p class="kicker">
+            {% if news.content_type == "now_showing" %}正在热播{% else %}近期预告{% endif %}
+        </p>
+        <h1>{{ news.title }}</h1>
+        {% if news.original_title %}
+            <p class="original-title">{{ news.original_title }}</p>
+        {% endif %}
+        <div class="fact-row">
+            <span>{{ news.event_date|date:"Y.m.d" }}</span>
+            <span>{{ news.event_label }}</span>
+            {% if news.genre_text %}<span>{{ news.genre_text }}</span>{% endif %}
+            <span>{{ news.get_region_display }}</span>
+        </div>
+        <p class="lead">{{ news.highlight }}</p>
+        <div class="button-row">
+            <a class="button primary" href="{% url 'blog:home' %}#movie-news">返回片讯</a>
+            {% if news.trailer_url %}
+                <a class="button" href="{{ news.trailer_url }}" target="_blank" rel="noopener">查看预告来源</a>
+            {% elif news.source_url %}
+                <a class="button" href="{{ news.source_url }}" target="_blank" rel="noopener">查看资料来源</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <aside class="news-detail-panel">
+        {% if news.poster_url %}
+            <img src="{{ news.poster_url }}" alt="{{ news.title }} poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+            <div class="poster-fallback is-hidden">{{ news.title }}</div>
+        {% else %}
+            <div class="poster-fallback">{{ news.title }}</div>
+        {% endif %}
+        {% if news.source_name %}
+            <p class="meta">资料来源：{{ news.source_name }}</p>
+        {% endif %}
+    </aside>
+</article>
+{% endblock %}

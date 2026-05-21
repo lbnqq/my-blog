@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load movie_posters %}
+
+{% block title %}{{ movie.title }} - 电影资料馆{% endblock %}
+
+{% block content %}
+<article class="movie-detail">
+    <div class="poster-frame detail-poster">
+        {% with poster_url=movie|cached_poster_url %}
+        {% if poster_url %}
+            <img src="{{ poster_url }}" alt="{{ movie.title }} poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+            <div class="poster-fallback is-hidden">{{ movie.title }}</div>
+        {% else %}
+            <div class="poster-fallback">{{ movie.title }}</div>
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="detail-copy">
+        <p class="eyebrow">Movie Archive</p>
+        <h1>{{ movie.title }}</h1>
+        {% if movie.original_title %}
+            <p class="original-title">{{ movie.original_title }}</p>
+        {% endif %}
+        <div class="fact-row">
+            {% if movie.rank %}<span>#{{ movie.rank|stringformat:"03d" }}</span>{% endif %}
+            {% if movie.year %}<span>{{ movie.year }}</span>{% endif %}
+            <span>豆瓣 {{ movie.rating }}</span>
+            <span>{{ movie.genres|join:" / " }}</span>
+        </div>
+        <p class="lead">{{ movie.summary }}</p>
+
+        <dl class="detail-list">
+            {% if movie.directors %}
+                <div><dt>导演</dt><dd>{{ movie.directors|join:" / " }}</dd></div>
+            {% endif %}
+            {% if movie.actors %}
+                <div><dt>主演</dt><dd>{{ movie.actors|join:" / " }}</dd></div>
+            {% endif %}
+            {% if movie.countries %}
+                <div><dt>地区</dt><dd>{{ movie.countries|join:" / " }}</dd></div>
+            {% endif %}
+        </dl>
+
+        <div class="button-row">
+            <a class="button primary" href="{% url 'ratings:category' %}">用它启发我的推荐</a>
+            <a class="button" href="{% url 'blog:home' %}">回到首页</a>
+        </div>
+    </div>
+</article>
+
+{% if related_movies %}
+    <section class="section-block">
+        <div class="section-heading">
+            <p class="kicker">Related</p>
+            <h2>相关影片</h2>
+        </div>
+        <div class="compact-movie-grid">
+            {% for related in related_movies %}
+                <a class="card compact-movie" href="{% url 'movies:detail' related.pk %}">
+                    <strong>{{ related.title }}</strong>
+                    <span>{{ related.year }} · 豆瓣 {{ related.rating }}</span>
+                    <p>{{ related.summary|truncatechars:72 }}</p>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+{% endif %}
+{% endblock %}

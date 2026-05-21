@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="烈刃之怒 poster">
+  <rect width="600" height="900" fill="#1f211f"/>
+  <rect x="42" y="42" width="516" height="816" fill="none" stroke="#9b6a32" stroke-width="3"/>
+  <path d="M126 720 468 120" stroke="#c8bdae" stroke-width="16"/>
+  <path d="M176 720 518 242" stroke="#6f2f28" stroke-width="12"/>
+  <text x="90" y="500" fill="#fffdf9" font-family="Microsoft YaHei, Arial, sans-serif" font-size="72" font-weight="800">烈刃之怒</text>
+  <text x="94" y="580" fill="#c8bdae" font-family="Arial, sans-serif" font-size="28">ACTION / FANTASY</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="爱情城事 poster">
+  <rect width="600" height="900" fill="#fffdf9"/>
+  <rect x="42" y="42" width="516" height="816" fill="#f4f1eb" stroke="#c8bdae" stroke-width="3"/>
+  <path d="M160 310h280M160 360h220M160 410h280" stroke="#9b6a32" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="430" cy="250" r="62" fill="#6f2f28" opacity=".75"/>
+  <text x="88" y="540" fill="#211c1a" font-family="Microsoft YaHei, Arial, sans-serif" font-size="68" font-weight="800">爱情城事</text>
+  <text x="92" y="620" fill="#6f6b63" font-family="Arial, sans-serif" font-size="28">LOVE / CITY</text>
+</svg>

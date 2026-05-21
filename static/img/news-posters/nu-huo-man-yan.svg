@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="怒火漫延 poster">
+  <rect width="600" height="900" fill="#211c1a"/>
+  <rect x="42" y="42" width="516" height="816" fill="none" stroke="#9b6a32" stroke-width="3"/>
+  <circle cx="470" cy="160" r="76" fill="#6f2f28" opacity=".72"/>
+  <path d="M92 590h416" stroke="#c8bdae" stroke-width="2"/>
+  <text x="82" y="430" fill="#fffdf9" font-family="Microsoft YaHei, Arial, sans-serif" font-size="72" font-weight="800">怒火漫延</text>
+  <text x="84" y="510" fill="#c8bdae" font-family="Arial, sans-serif" font-size="28">ACTION / CRIME</text>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="光影里的夏天 poster">
+  <rect width="600" height="900" fill="#fffdf9"/>
+  <rect x="42" y="42" width="516" height="816" fill="#f4f1eb" stroke="#c8bdae" stroke-width="3"/>
+  <circle cx="420" cy="210" r="88" fill="#9b6a32" opacity=".45"/>
+  <path d="M120 390c86-64 164-64 252 0 42 30 82 30 122 0" fill="none" stroke="#285c4d" stroke-width="12" stroke-linecap="round"/>
+  <text x="80" y="540" fill="#211c1a" font-family="Microsoft YaHei, Arial, sans-serif" font-size="58" font-weight="800">光影里的</text>
+  <text x="80" y="620" fill="#211c1a" font-family="Microsoft YaHei, Arial, sans-serif" font-size="58" font-weight="800">夏天</text>
+  <text x="86" y="700" fill="#6f6b63" font-family="Arial, sans-serif" font-size="28">YOUTH / DRAMA</text>
+</svg>

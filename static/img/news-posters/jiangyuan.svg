@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="酱园弄 poster">
+  <rect width="600" height="900" fill="#211c1a"/>
+  <rect x="42" y="42" width="516" height="816" fill="#2d2522" stroke="#c8bdae" stroke-width="3"/>
+  <path d="M90 214h420" stroke="#9b6a32" stroke-width="6"/>
+  <path d="M150 292c84-74 216-74 300 0v150c-84 74-216 74-300 0z" fill="#f4f1eb"/>
+  <path d="M184 360c58-38 174-38 232 0" fill="none" stroke="#6f2f28" stroke-width="14" stroke-linecap="round"/>
+  <circle cx="230" cy="396" r="16" fill="#211c1a"/>
+  <circle cx="370" cy="396" r="16" fill="#211c1a"/>
+  <path d="M250 474c34 18 66 18 100 0" fill="none" stroke="#211c1a" stroke-width="10" stroke-linecap="round"/>
+  <text x="86" y="630" fill="#fffdf9" font-family="Microsoft YaHei, Arial, sans-serif" font-size="82" font-weight="800">酱园弄</text>
+  <text x="92" y="708" fill="#c8bdae" font-family="Arial, sans-serif" font-size="28">MYSTERY / DRAMA</text>
+  <text x="92" y="760" fill="#9b6a32" font-family="Microsoft YaHei, Arial, sans-serif" font-size="24">正在热映</text>
+</svg>
