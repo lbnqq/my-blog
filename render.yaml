@@ -28,3 +28,61 @@ services:
         generateValue: true
       - key: SUPABASE_DB_PASSWORD
         sync: false
+  - type: cron
+    name: movie-blog-douban-chart-sync
+    runtime: python
+    schedule: "0 19 * * *"
+    buildCommand: "bash build.sh"
+    startCommand: "python manage.py sync_douban_chart"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: USE_SQLITE
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: SUPABASE_DB_NAME
+        value: "postgres"
+      - key: SUPABASE_DB_USER
+        value: "movie_blog_django"
+      - key: SUPABASE_DB_HOST
+        value: "db.bbfoajvzijbvlvsjvsvb.supabase.co"
+      - key: SUPABASE_DB_PORT
+        value: "5432"
+      - key: SUPABASE_DB_SSLMODE
+        value: "require"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+  - type: cron
+    name: movie-blog-douban-weekly-reputation-sync
+    runtime: python
+    schedule: "30 19 * * *"
+    buildCommand: "bash build.sh"
+    startCommand: "python manage.py sync_douban_weekly_reputation"
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: USE_SQLITE
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: SUPABASE_DB_NAME
+        value: "postgres"
+      - key: SUPABASE_DB_USER
+        value: "movie_blog_django"
+      - key: SUPABASE_DB_HOST
+        value: "db.bbfoajvzijbvlvsjvsvb.supabase.co"
+      - key: SUPABASE_DB_PORT
+        value: "5432"
+      - key: SUPABASE_DB_SSLMODE
+        value: "require"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_DB_PASSWORD
+        sync: false

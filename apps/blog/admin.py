@@ -1,6 +1,22 @@
 from django.contrib import admin
 
-from .models import UpcomingMovieNews
+from .models import DoubanChartMovie, DoubanWeeklyReputationMovie, UpcomingMovieNews
+
+
+@admin.register(DoubanChartMovie)
+class DoubanChartMovieAdmin(admin.ModelAdmin):
+    list_display = ("rank", "title", "rating", "rating_count", "is_active", "fetched_at")
+    list_filter = ("is_active", "fetched_at")
+    search_fields = ("title", "subtitle", "douban_id")
+    ordering = ("rank", "title")
+
+
+@admin.register(DoubanWeeklyReputationMovie)
+class DoubanWeeklyReputationMovieAdmin(admin.ModelAdmin):
+    list_display = ("rank", "title", "rating", "rating_count", "is_active", "fetched_at")
+    list_filter = ("is_active", "fetched_at")
+    search_fields = ("title", "subtitle", "douban_id")
+    ordering = ("rank", "title")
 
 
 @admin.register(UpcomingMovieNews)

@@ -1,6 +1,54 @@
 from django.db import models
 
 
+class DoubanChartMovie(models.Model):
+    douban_id = models.CharField(max_length=32, unique=True, db_index=True)
+    rank = models.PositiveIntegerField(db_index=True)
+    title = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=255, blank=True)
+    info_text = models.TextField(blank=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    rating_count = models.PositiveIntegerField(default=0)
+    poster_url = models.URLField(blank=True)
+    subject_url = models.URLField()
+    fetched_at = models.DateTimeField(db_index=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["rank", "title"]
+        verbose_name = "douban chart movie"
+        verbose_name_plural = "douban chart movies"
+
+    def __str__(self):
+        return f"#{self.rank} {self.title}"
+
+
+class DoubanWeeklyReputationMovie(models.Model):
+    douban_id = models.CharField(max_length=32, unique=True, db_index=True)
+    rank = models.PositiveIntegerField(db_index=True)
+    title = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=255, blank=True)
+    info_text = models.TextField(blank=True)
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
+    rating_count = models.PositiveIntegerField(default=0)
+    poster_url = models.URLField(blank=True)
+    subject_url = models.URLField()
+    fetched_at = models.DateTimeField(db_index=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["rank", "title"]
+        verbose_name = "douban weekly reputation movie"
+        verbose_name_plural = "douban weekly reputation movies"
+
+    def __str__(self):
+        return f"#{self.rank} {self.title}"
+
+
 class UpcomingMovieNews(models.Model):
     class ContentType(models.TextChoices):
         UPCOMING = "upcoming", "近期预告"

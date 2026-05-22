@@ -59,38 +59,33 @@ class MovieBlogHomepageTests(TestCase):
         self.assertIn(related, results)
         self.assertNotIn(current, results)
 
-    def test_homepage_shows_daily_movie_upcoming_news_and_recommendation_entry(self):
-        from apps.blog.models import UpcomingMovieNews
+    def test_homepage_shows_daily_movie_weekly_reputation_chart_and_recommendation_entry(self):
+        from apps.blog.models import DoubanChartMovie, DoubanWeeklyReputationMovie
 
         daily = self.make_movie(1)
-        UpcomingMovieNews.objects.create(
-            title="Domestic Trailer",
-            event_date=timezone.localdate() + datetime.timedelta(days=2),
-            event_label="Coming soon",
-            genre_text="Drama",
-            highlight="A short weekly movie highlight.",
-            is_active=True,
-            content_type=UpcomingMovieNews.ContentType.UPCOMING,
-            region=UpcomingMovieNews.Region.DOMESTIC,
+        DoubanWeeklyReputationMovie.objects.create(
+            douban_id="37116446",
+            rank=1,
+            title="Weekly Movie",
+            subtitle="Weekly Alias",
+            info_text="Director / Drama / China",
+            rating="9.1",
+            rating_count=539301,
+            poster_url="https://example.com/weekly.webp",
+            subject_url="https://movie.douban.com/subject/37116446/",
+            fetched_at=timezone.now(),
         )
-        UpcomingMovieNews.objects.create(
-            title="Foreign Trailer",
-            event_date=timezone.localdate() + datetime.timedelta(days=3),
-            event_label="Coming soon",
-            genre_text="Sci-Fi",
-            highlight="A short overseas trailer highlight.",
-            is_active=True,
-            content_type=UpcomingMovieNews.ContentType.UPCOMING,
-            region=UpcomingMovieNews.Region.FOREIGN,
-        )
-        UpcomingMovieNews.objects.create(
-            title="Now Showing",
-            event_date=timezone.localdate(),
-            event_label="正在热映",
-            genre_text="Action",
-            highlight="A current theater highlight.",
-            is_active=True,
-            content_type=UpcomingMovieNews.ContentType.NOW_SHOWING,
+        DoubanChartMovie.objects.create(
+            douban_id="37116612",
+            rank=1,
+            title="Chart Movie",
+            subtitle="Chart Alias",
+            info_text="2026-01-01 / Director / Drama",
+            rating="9.1",
+            rating_count=104955,
+            poster_url="https://example.com/chart.webp",
+            subject_url="https://movie.douban.com/subject/37116612/",
+            fetched_at=timezone.now(),
         )
 
         response = self.client.get(reverse("blog:home"))
@@ -99,33 +94,35 @@ class MovieBlogHomepageTests(TestCase):
         self.assertContains(response, daily.title)
         self.assertContains(response, "今日电影推荐")
         self.assertContains(response, "近期片讯")
-        self.assertContains(response, "近期预告")
-        self.assertContains(response, "国内预告")
-        self.assertContains(response, "国外预告")
-        self.assertContains(response, "正在热播")
-        self.assertContains(response, "Domestic Trailer")
-        self.assertContains(response, "Foreign Trailer")
-        self.assertContains(response, "Now Showing")
+        self.assertContains(response, "一周口碑榜")
+        self.assertContains(response, "豆瓣电影排行榜")
+        self.assertContains(response, "Weekly Movie")
+        self.assertContains(response, "539301人评价")
+        self.assertContains(response, "Chart Movie")
+        self.assertContains(response, "104955人评价")
+        self.assertNotContains(response, "近期预告")
+        self.assertNotContains(response, "国内预告")
+        self.assertNotContains(response, "国外预告")
         self.assertContains(response, reverse("ratings:category"))
 
-    def test_now_showing_homepage_links_open_news_detail_pages(self):
-        from apps.blog.models import UpcomingMovieNews
+    def test_douban_chart_homepage_links_open_douban_subject_pages(self):
+        from apps.blog.models import DoubanChartMovie
 
         self.make_movie(1)
-        news = UpcomingMovieNews.objects.create(
-            title="Now Showing Detail",
-            event_date=timezone.localdate(),
-            event_label="正在热映",
-            genre_text="Drama",
-            highlight="This card should open its own local detail page.",
-            is_active=True,
-            content_type=UpcomingMovieNews.ContentType.NOW_SHOWING,
+        DoubanChartMovie.objects.create(
+            douban_id="37116612",
+            rank=1,
+            title="Chart Movie Detail",
+            rating="9.1",
+            rating_count=104955,
+            subject_url="https://movie.douban.com/subject/37116612/",
+            fetched_at=timezone.now(),
         )
 
         response = self.client.get(reverse("blog:home"))
 
-        self.assertContains(response, reverse("blog:news_detail", args=[news.pk]))
-        self.assertNotContains(response, 'href="https://movie.douban.com/"')
+        self.assertContains(response, 'href="https://movie.douban.com/subject/37116612/"')
+        self.assertNotContains(response, reverse("blog:news_detail", args=[1]))
 
     def test_news_detail_page_shows_news_information(self):
         from apps.blog.models import UpcomingMovieNews
@@ -154,27 +151,30 @@ class MovieBlogHomepageTests(TestCase):
         self.assertContains(response, news.source_url)
         self.assertContains(response, news.poster_url)
 
-    def test_homepage_uses_one_unified_recent_news_module_not_duplicate_sections(self):
-        from apps.blog.models import UpcomingMovieNews
+    def test_homepage_uses_weekly_reputation_module_not_legacy_trailer_sections(self):
+        from apps.blog.models import DoubanWeeklyReputationMovie
 
         daily = self.make_movie(1)
         self.make_movie(2, title="Old Similar Movie", year=1995, rank=101)
-        UpcomingMovieNews.objects.create(
-            title="New Trailer",
-            event_date=timezone.localdate() + datetime.timedelta(days=1),
-            event_label="Coming soon",
-            genre_text="Sci-Fi",
-            highlight="A new release trailer.",
-            is_active=True,
-            content_type=UpcomingMovieNews.ContentType.UPCOMING,
-            region=UpcomingMovieNews.Region.DOMESTIC,
+        DoubanWeeklyReputationMovie.objects.create(
+            douban_id="37116446",
+            rank=1,
+            title="Weekly Reputation",
+            rating="9.1",
+            rating_count=539301,
+            subject_url="https://movie.douban.com/subject/37116446/",
+            fetched_at=timezone.now(),
         )
 
         response = self.client.get(reverse("blog:home"))
 
         self.assertContains(response, daily.title)
         self.assertContains(response, "近期片讯")
-        self.assertContains(response, "New Trailer")
+        self.assertContains(response, "一周口碑榜")
+        self.assertContains(response, "Weekly Reputation")
+        self.assertNotContains(response, "近期预告")
+        self.assertNotContains(response, "国内预告")
+        self.assertNotContains(response, "国外预告")
         self.assertNotContains(response, "本周预告")
         self.assertNotContains(response, "近期新片与预告")
         self.assertNotContains(response, "和今日电影相关")
