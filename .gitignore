@@ -10,3 +10,4 @@ venv/
 staticfiles/
 output/
 .playwright-cli/
+runserver-*.log

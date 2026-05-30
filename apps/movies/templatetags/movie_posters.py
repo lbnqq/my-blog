@@ -5,6 +5,7 @@ from django import template
 from django.conf import settings
 from django.contrib.staticfiles import finders
 from django.templatetags.static import static
+from django.urls import reverse
 
 
 register = template.Library()
@@ -29,6 +30,8 @@ def cached_poster_url(movie):
         return ""
     if finders.find(relative_path):
         return static(relative_path)
+    if movie.poster_url:
+        return reverse("movies:poster", args=[movie.pk])
     return ""
 
 

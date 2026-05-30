@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test import TestCase, override_settings
@@ -41,9 +42,29 @@ class MoviePosterTests(TestCase):
         self.assertNotContains(response, '<div class="poster-fallback">肖申克的救赎</div>')
 
     @override_settings(STATICFILES_DIRS=[settings.BASE_DIR / "tests" / "fixtures" / "static"])
-    def test_detail_page_falls_back_to_title_when_cached_poster_is_missing(self):
+    def test_detail_page_uses_proxy_poster_when_cached_poster_is_missing(self):
         movie = self.make_movie()
 
         response = self.client.get(reverse("movies:detail", args=[movie.pk]))
 
-        self.assertContains(response, '<div class="poster-fallback">肖申克的救赎</div>')
+        self.assertContains(response, reverse("movies:poster", args=[movie.pk]))
+        self.assertContains(response, '<div class="poster-fallback is-hidden">肖申克的救赎</div>')
+
+    @override_settings(STATICFILES_DIRS=[settings.BASE_DIR / "tests" / "fixtures" / "static"])
+    def test_homepage_uses_proxy_poster_when_cached_poster_is_missing(self):
+        movie = self.make_movie()
+
+        response = self.client.get(reverse("blog:home"))
+
+        self.assertContains(response, reverse("movies:poster", args=[movie.pk]))
+        self.assertContains(response, '<div class="poster-fallback is-hidden">肖申克的救赎</div>')
+
+    def test_movie_poster_proxy_streams_remote_poster(self):
+        movie = self.make_movie()
+
+        with patch("apps.movies.views.fetch_movie_poster", return_value=(b"poster-bytes", "image/webp")):
+            response = self.client.get(reverse("movies:poster", args=[movie.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "image/webp")
+        self.assertEqual(response.content, b"poster-bytes")
