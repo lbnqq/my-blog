@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}我的推荐{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="kicker">History</p>
+    <h1>我的推荐</h1>
+    <p class="lead">这里保存了你登录后完成的评分记录和系统推荐片单。</p>
+</section>
+
+{% if sessions %}
+    <div class="movie-list">
+        {% for session in sessions %}
+            <article class="card history-card">
+                <div>
+                    <h2>{{ session.category_label }}</h2>
+                    <p class="meta">
+                        创建时间：{{ session.created_at|date:"Y-m-d H:i" }}
+                        {% if session.completed_at %} · 完成时间：{{ session.completed_at|date:"Y-m-d H:i" }}{% endif %}
+                    </p>
+                    <p>评分数量：{{ session.rating_count }}</p>
+                    {% with first_result=session.recommendation_results.all|first %}
+                        {% if first_result %}
+                            <p>推荐预览：{{ first_result.movie.title }} · {{ first_result.reason }}</p>
+                        {% else %}
+                            <p>暂未生成推荐结果。</p>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                <a class="button primary" href="{% url 'accounts:recommendation_history_detail' session.session_key %}">查看详情</a>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="message">你还没有登录后完成的推荐记录。</p>
+    <p class="form-actions">
+        <a class="button primary" href="{% url 'ratings:category' %}">开始个性化推荐</a>
+    </p>
+{% endif %}
+{% endblock %}

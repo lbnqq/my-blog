@@ -1,0 +1,53 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .admin-language-switcher {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 8px;
+    }
+
+    .admin-language-switcher form {
+        display: inline;
+        margin: 0;
+    }
+
+    .admin-language-switcher button {
+        border: 1px solid var(--hairline-color);
+        border-radius: 999px;
+        padding: 2px 8px;
+        background: var(--body-bg);
+        color: var(--link-fg);
+        cursor: pointer;
+        font: inherit;
+    }
+
+    .admin-language-switcher button.is-active {
+        background: var(--link-fg);
+        color: var(--button-fg);
+    }
+</style>
+{% endblock %}
+
+{% block usertools %}
+<div class="admin-language-switcher" aria-label="Language switcher">
+    {% get_current_language as CURRENT_LANGUAGE %}
+    <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        <input name="language" type="hidden" value="zh-hans">
+        <button type="submit" class="{% if CURRENT_LANGUAGE == 'zh-hans' %}is-active{% endif %}">中文</button>
+    </form>
+    <form action="{% url 'set_language' %}" method="post">
+        {% csrf_token %}
+        <input name="next" type="hidden" value="{{ request.get_full_path }}">
+        <input name="language" type="hidden" value="en">
+        <button type="submit" class="{% if CURRENT_LANGUAGE == 'en' %}is-active{% endif %}">English</button>
+    </form>
+</div>
+{{ block.super }}
+{% endblock %}

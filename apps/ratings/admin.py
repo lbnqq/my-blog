@@ -16,7 +16,7 @@ class RatingFormAdmin(admin.ModelAdmin):
 
 @admin.register(UserSession)
 class UserSessionAdmin(admin.ModelAdmin):
-    list_display = ("session_key", "selected_category", "created_at", "completed_at")
+    list_display = ("session_key", "selected_category", "user", "created_at", "completed_at")
     list_filter = ("selected_category",)
 
 

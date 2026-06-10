@@ -1,8 +1,10 @@
 import uuid
 
+from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from apps.admin_labels import bilingual_label
 from apps.movies.models import Movie
 from apps.movies.services.classifier import CATEGORY_LABELS
 
@@ -18,6 +20,8 @@ class RatingForm(models.Model):
 
     class Meta:
         ordering = ["category"]
+        verbose_name = bilingual_label("评分表", "Rating Form")
+        verbose_name_plural = bilingual_label("评分表", "Rating Forms")
 
     def __str__(self):
         return self.title
@@ -32,6 +36,8 @@ class RatingFormMovie(models.Model):
 
     class Meta:
         ordering = ["sort_order", "id"]
+        verbose_name = bilingual_label("评分表电影", "Rating Form Movie")
+        verbose_name_plural = bilingual_label("评分表电影", "Rating Form Movies")
         constraints = [
             models.UniqueConstraint(fields=["form", "movie"], name="unique_form_movie"),
         ]
@@ -45,12 +51,20 @@ class UserSession(models.Model):
 
     session_key = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     selected_category = models.CharField(max_length=32, choices=CATEGORY_CHOICES)
-    user_id = models.CharField(max_length=128, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="rating_sessions",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name = bilingual_label("用户推荐会话", "User Recommendation Session")
+        verbose_name_plural = bilingual_label("用户推荐会话", "User Recommendation Sessions")
 
     def __str__(self):
         return str(self.session_key)
@@ -66,6 +80,8 @@ class UserRating(models.Model):
 
     class Meta:
         ordering = ["created_at"]
+        verbose_name = bilingual_label("用户偏好评分", "User Preference Rating")
+        verbose_name_plural = bilingual_label("用户偏好评分", "User Preference Ratings")
         constraints = [
             models.UniqueConstraint(fields=["session", "movie"], name="unique_session_movie_rating"),
         ]

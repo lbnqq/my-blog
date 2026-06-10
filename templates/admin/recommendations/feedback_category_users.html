@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">首页</a>
+    &rsaquo; <a href="{% url 'admin:recommendations_recommendationfeedback_changelist' %}">推荐反馈</a>
+    &rsaquo; {{ category_label }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ category_label }} 推荐反馈用户</h1>
+    <p>点击用户查看该用户对 {{ category_label }} 推荐结果的反馈明细。</p>
+    <div class="module">
+        <table>
+            <thead>
+                <tr>
+                    <th>用户</th>
+                    <th>反馈数量</th>
+                    <th>平均反馈分</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in user_rows %}
+                    <tr>
+                        <th scope="row"><a href="{{ row.url }}">{{ row.label }}</a></th>
+                        <td>{{ row.feedback_count }}</td>
+                        <td>{{ row.average_rating|floatformat:2 }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3">该分类下还没有推荐反馈。</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

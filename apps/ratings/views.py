@@ -7,6 +7,7 @@ from apps.ratings.forms import CategorySelectionForm
 from apps.ratings.models import UserRating, UserSession
 from apps.ratings.services.rating_form_service import get_active_form_for_category
 from apps.ratings.services.session_service import create_user_session
+from apps.recommendations.services.feedback import attach_feedback_ratings, save_recommendation_feedback
 from apps.recommendations.services.recommender import recommend_movies
 
 
@@ -14,7 +15,8 @@ def select_category(request):
     if request.method == "POST":
         form = CategorySelectionForm(request.POST)
         if form.is_valid():
-            session = create_user_session(form.cleaned_data["category"])
+            user = request.user if request.user.is_authenticated else None
+            session = create_user_session(form.cleaned_data["category"], user=user)
             return redirect(reverse("ratings:rate", args=[session.session_key]))
     else:
         form = CategorySelectionForm()
@@ -66,7 +68,17 @@ def rate_movies(request, session_key):
 
 def recommendation_result(request, session_key):
     session = get_object_or_404(UserSession, session_key=session_key)
-    results = session.recommendation_results.select_related("movie").order_by("rank_order")
+    results = list(
+        session.recommendation_results.select_related("movie").prefetch_related("feedback").order_by("rank_order")
+    )
+    attach_feedback_ratings(results)
+
+    if request.method == "POST":
+        saved_count = save_recommendation_feedback(request.POST, results)
+        if saved_count:
+            messages.success(request, f"已保存 {saved_count} 条推荐反馈。")
+        return redirect(reverse("ratings:result", args=[session.session_key]))
+
     return render(
         request,
         "recommendations/result.html",
@@ -74,5 +86,6 @@ def recommendation_result(request, session_key):
             "session": session,
             "results": results,
             "category_label": CATEGORY_LABELS.get(session.selected_category, ""),
+            "rating_values": [1, 2, 3, 4, 5],
         },
     )

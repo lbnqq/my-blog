@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}登录{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="kicker">Account</p>
+    <h1>登录</h1>
+    <p class="lead">登录后生成的个性化推荐会自动归档到你的账号。</p>
+</section>
+
+<form method="post" class="card auth-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+        <label>
+            <span>{{ field.label }}</span>
+            {{ field }}
+            {{ field.errors }}
+        </label>
+    {% endfor %}
+    <div class="form-actions">
+        <button class="primary" type="submit">登录</button>
+        <a class="button" href="{% url 'accounts:register' %}">注册新账号</a>
+    </div>
+</form>
+{% endblock %}

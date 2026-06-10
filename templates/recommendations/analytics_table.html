@@ -1,0 +1,37 @@
+<section class="section-block">
+    <div class="section-heading">
+        <h2>{{ title }}</h2>
+    </div>
+    <div class="card table-card">
+        <table class="analytics-table">
+            <thead>
+                <tr>
+                    <th>分组</th>
+                    <th>推荐数</th>
+                    <th>反馈数</th>
+                    <th>覆盖率</th>
+                    <th>平均分</th>
+                    <th>好评率</th>
+                    <th>差评率</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.label }}</td>
+                        <td>{{ row.total_count }}</td>
+                        <td>{{ row.feedback_count }}</td>
+                        <td>{{ row.coverage_rate|floatformat:1 }}%</td>
+                        <td>{{ row.average_rating|floatformat:2 }}</td>
+                        <td>{{ row.positive_rate|floatformat:1 }}%</td>
+                        <td>{{ row.negative_rate|floatformat:1 }}%</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">暂无数据。</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

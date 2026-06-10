@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}注册账号{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="kicker">Account</p>
+    <h1>注册账号</h1>
+    <p class="lead">注册后，你的评分记录和系统推荐片单会保存在“我的推荐”里。</p>
+</section>
+
+<form method="post" class="card auth-form">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+        <label>
+            <span>{{ field.label }}</span>
+            {{ field }}
+            {% if field.help_text %}
+                <small>{{ field.help_text }}</small>
+            {% endif %}
+            {{ field.errors }}
+        </label>
+    {% endfor %}
+    <div class="form-actions">
+        <button class="primary" type="submit">注册并登录</button>
+        <a class="button" href="{% url 'accounts:login' %}">已有账号，去登录</a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">首页</a>
+    &rsaquo; <a href="{% url 'admin:recommendations_recommendationfeedback_changelist' %}">推荐反馈</a>
+    &rsaquo; <a href="{% url 'admin:recommendation_feedback_category' category %}">{{ category_label }}</a>
+    &rsaquo; {{ user_label }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ user_label }} 的 {{ category_label }} 推荐反馈</h1>
+    <div class="module">
+        <table>
+            <thead>
+                <tr>
+                    <th>电影</th>
+                    <th>推荐排名</th>
+                    <th>反馈评分</th>
+                    <th>算法版本</th>
+                    <th>推荐得分</th>
+                    <th>更新时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for feedback in feedbacks %}
+                    <tr>
+                        <th scope="row">{{ feedback.recommendation_result.movie.title }}</th>
+                        <td>#{{ feedback.recommendation_result.rank_order|stringformat:"02d" }}</td>
+                        <td>{{ feedback.rating }}</td>
+                        <td>{{ feedback.recommendation_result.algorithm_version }}</td>
+                        <td>{{ feedback.recommendation_result.score|floatformat:3 }}</td>
+                        <td>{{ feedback.updated_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">该用户在此分类下还没有推荐反馈。</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

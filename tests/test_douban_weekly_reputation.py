@@ -1,4 +1,5 @@
 import datetime
+import urllib.error
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -135,6 +136,35 @@ class DoubanWeeklyReputationParserTests(TestCase):
         self.assertEqual(detail.rating, Decimal("9.1"))
         self.assertEqual(detail.rating_count, 539301)
         self.assertEqual(detail.poster_url, "https://img1.doubanio.com/view/photo/m/public/p2931851430.jpg")
+
+
+class DoubanWeeklyReputationFetchTests(TestCase):
+    def test_fetch_chart_html_falls_back_to_curl_when_urlopen_ssl_fails(self):
+        from apps.blog.services import douban_weekly_reputation
+
+        curl_result = type(
+            "CompletedProcess",
+            (),
+            {
+                "returncode": 0,
+                "stdout": CHART_HTML,
+                "stderr": "",
+            },
+        )()
+
+        with patch(
+            "apps.blog.services.douban_weekly_reputation.urllib.request.urlopen",
+            side_effect=urllib.error.URLError("ssl eof"),
+        ), patch(
+            "subprocess.run",
+            return_value=curl_result,
+        ) as run:
+            html = douban_weekly_reputation.fetch_douban_chart_html()
+
+        self.assertEqual(html, CHART_HTML)
+        command = run.call_args.args[0]
+        self.assertEqual(command[0], "curl")
+        self.assertIn("https://movie.douban.com/chart", command)
 
 
 class DoubanWeeklyReputationSyncTests(TestCase):

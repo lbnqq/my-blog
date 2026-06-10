@@ -1,6 +1,7 @@
 import datetime
 import json
 import re
+import subprocess
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -231,16 +232,52 @@ def parse_subject_json(raw_json):
 
 
 def fetch_douban_chart_html():
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Referer": "https://movie.douban.com/",
+    }
     request = urllib.request.Request(
         DOUBAN_CHART_URL,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Referer": "https://movie.douban.com/",
-        },
+        headers=headers,
     )
-    with urllib.request.urlopen(request, timeout=20) as response:
-        return response.read().decode("utf-8", errors="replace")
+    try:
+        with urllib.request.urlopen(request, timeout=20) as response:
+            return response.read().decode("utf-8", errors="replace")
+    except (OSError, urllib.error.URLError, urllib.error.HTTPError, TimeoutError):
+        return fetch_url_with_curl(DOUBAN_CHART_URL, headers=headers, timeout=20)
+
+
+def fetch_url_with_curl(url, headers, timeout):
+    command = ["curl", "-L", "--max-time", str(timeout)]
+    user_agent = headers.get("User-Agent")
+    referer = headers.get("Referer")
+    if user_agent:
+        command.extend(["-A", user_agent])
+    if referer:
+        command.extend(["-e", referer])
+    for name, value in headers.items():
+        if name in {"User-Agent", "Referer"}:
+            continue
+        command.extend(["-H", f"{name}: {value}"])
+    command.append(url)
+
+    try:
+        result = subprocess.run(
+            command,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            check=False,
+        )
+    except OSError as exc:
+        raise urllib.error.URLError(exc) from exc
+
+    if result.returncode != 0:
+        message = clean_text(result.stderr) or f"curl exited with status {result.returncode}"
+        raise urllib.error.URLError(message)
+    return result.stdout
 
 
 def fetch_subject_html(subject_url):

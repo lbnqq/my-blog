@@ -99,6 +99,19 @@ a {
     background: rgba(255, 248, 237, 0.045);
 }
 
+.nav-logout {
+    margin: 0;
+}
+
+.nav-logout button {
+    min-height: 34px;
+    padding: 0 12px;
+    border-color: rgba(255, 248, 237, 0.2);
+    color: #fff8ed;
+    background: rgba(255, 248, 237, 0.045);
+    font-size: 14px;
+}
+
 .site-main {
     width: min(1120px, calc(100% - 36px));
     margin: 0 auto;
@@ -274,6 +287,104 @@ button.primary {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+}
+
+.auth-form {
+    max-width: 560px;
+    display: grid;
+    gap: 16px;
+}
+
+.auth-form label {
+    display: grid;
+    gap: 7px;
+    color: var(--accent-strong);
+    font-weight: 800;
+}
+
+.auth-form input {
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    background: var(--paper);
+    color: var(--text);
+    font: inherit;
+}
+
+.auth-form small,
+.auth-form .helptext,
+.auth-form ul {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.auth-form .errorlist {
+    color: var(--accent);
+}
+
+.history-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 22px;
+    align-items: center;
+}
+
+.feedback-block {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+}
+
+.feedback-block span {
+    color: var(--muted);
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+}
+
+.metric-card {
+    display: grid;
+    gap: 8px;
+}
+
+.metric-card span {
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.metric-card strong {
+    color: var(--accent);
+    font-size: 30px;
+}
+
+.table-card {
+    overflow-x: auto;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+}
+
+.analytics-table th,
+.analytics-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+}
+
+.analytics-table th {
+    color: var(--accent-strong);
+    background: rgba(111, 47, 40, 0.06);
 }
 
 .movie-list {
@@ -860,7 +971,8 @@ button.primary {
         min-height: 220px;
     }
 
-    .movie-card {
+    .movie-card,
+    .history-card {
         grid-template-columns: 1fr;
     }
 

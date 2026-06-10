@@ -1,6 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from apps.admin_labels import bilingual_label
 from apps.movies.services.classifier import CATEGORY_LABELS
 
 
@@ -31,6 +32,8 @@ class Movie(models.Model):
 
     class Meta:
         ordering = ["rank", "-rating", "title"]
+        verbose_name = bilingual_label("电影库", "Movie Library")
+        verbose_name_plural = bilingual_label("电影库", "Movie Library")
         constraints = [
             models.UniqueConstraint(
                 fields=["douban_id"],

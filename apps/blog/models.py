@@ -1,5 +1,7 @@
 from django.db import models
 
+from apps.admin_labels import bilingual_label
+
 
 class DoubanChartMovie(models.Model):
     douban_id = models.CharField(max_length=32, unique=True, db_index=True)
@@ -18,8 +20,8 @@ class DoubanChartMovie(models.Model):
 
     class Meta:
         ordering = ["rank", "title"]
-        verbose_name = "douban chart movie"
-        verbose_name_plural = "douban chart movies"
+        verbose_name = bilingual_label("豆瓣电影排行榜", "Douban Chart Movie")
+        verbose_name_plural = bilingual_label("豆瓣电影排行榜", "Douban Chart Movies")
 
     def __str__(self):
         return f"#{self.rank} {self.title}"
@@ -42,8 +44,8 @@ class DoubanWeeklyReputationMovie(models.Model):
 
     class Meta:
         ordering = ["rank", "title"]
-        verbose_name = "douban weekly reputation movie"
-        verbose_name_plural = "douban weekly reputation movies"
+        verbose_name = bilingual_label("豆瓣一周口碑榜", "Douban Weekly Reputation Movie")
+        verbose_name_plural = bilingual_label("豆瓣一周口碑榜", "Douban Weekly Reputation Movies")
 
     def __str__(self):
         return f"#{self.rank} {self.title}"
@@ -77,8 +79,8 @@ class UpcomingMovieNews(models.Model):
 
     class Meta:
         ordering = ["event_date", "sort_order", "title"]
-        verbose_name = "upcoming movie news"
-        verbose_name_plural = "upcoming movie news"
+        verbose_name = bilingual_label("近期片讯", "Upcoming Movie News")
+        verbose_name_plural = bilingual_label("近期片讯", "Upcoming Movie News")
 
     def __str__(self):
         return self.title

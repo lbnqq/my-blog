@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}推荐算法统计{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <p class="kicker">Analytics</p>
+    <h1>推荐算法统计</h1>
+    <p class="lead">根据用户对推荐电影的反馈评分，查看算法覆盖率、满意度和不同排名区间的效果。</p>
+</section>
+
+<section class="analytics-grid">
+    <article class="card metric-card">
+        <span>推荐结果总数</span>
+        <strong>{{ metrics.total_count }}</strong>
+    </article>
+    <article class="card metric-card">
+        <span>反馈数</span>
+        <strong>{{ metrics.feedback_count }}</strong>
+    </article>
+    <article class="card metric-card">
+        <span>反馈覆盖率</span>
+        <strong>{{ metrics.coverage_rate|floatformat:1 }}%</strong>
+    </article>
+    <article class="card metric-card">
+        <span>平均反馈分</span>
+        <strong>{{ metrics.average_rating|floatformat:2 }}</strong>
+    </article>
+    <article class="card metric-card">
+        <span>好评率</span>
+        <strong>{{ metrics.positive_rate|floatformat:1 }}%</strong>
+    </article>
+    <article class="card metric-card">
+        <span>差评率</span>
+        <strong>{{ metrics.negative_rate|floatformat:1 }}%</strong>
+    </article>
+</section>
+
+{% include "recommendations/analytics_table.html" with title="按推荐排名分组" rows=rank_rows %}
+{% include "recommendations/analytics_table.html" with title="按算法版本分组" rows=algorithm_rows %}
+{% include "recommendations/analytics_table.html" with title="按推荐分类分组" rows=category_rows %}
+{% endblock %}

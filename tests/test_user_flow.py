@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
@@ -51,6 +52,17 @@ class UserFlowTests(TestCase):
         response = self.client.post(reverse("ratings:category"), {"category": "suspense_crime"})
         session = UserSession.objects.get()
         self.assertRedirects(response, reverse("ratings:rate", args=[session.session_key]))
+        self.assertIsNone(session.user)
+
+    def test_post_category_links_session_to_logged_in_user(self):
+        user = get_user_model().objects.create_user(username="alice", password="secret12345")
+        self.client.force_login(user)
+
+        response = self.client.post(reverse("ratings:category"), {"category": "suspense_crime"})
+
+        session = UserSession.objects.get()
+        self.assertRedirects(response, reverse("ratings:rate", args=[session.session_key]))
+        self.assertEqual(session.user, user)
 
     def test_rating_requires_at_least_eight_scores(self):
         session = UserSession.objects.create(selected_category="suspense_crime")
@@ -71,6 +83,17 @@ class UserFlowTests(TestCase):
         self.assertEqual(UserRating.objects.filter(session=session).count(), 8)
         self.assertGreater(RecommendationResult.objects.filter(session=session).count(), 0)
 
+    def test_logged_in_rating_submission_keeps_results_attached_to_user_session(self):
+        user = get_user_model().objects.create_user(username="alice", password="secret12345")
+        session = UserSession.objects.create(selected_category="suspense_crime", user=user)
+        payload = {f"movie_{movie.id}": "5" for movie in self.movies[:8]}
+
+        response = self.client.post(reverse("ratings:rate", args=[session.session_key]), payload)
+
+        self.assertRedirects(response, reverse("ratings:result", args=[session.session_key]))
+        self.assertEqual(UserRating.objects.filter(session__user=user).count(), 8)
+        self.assertGreater(RecommendationResult.objects.filter(session__user=user).count(), 0)
+
     def test_result_page_loads_saved_recommendations(self):
         session = UserSession.objects.create(selected_category="suspense_crime")
         RecommendationResult.objects.create(
@@ -85,3 +108,89 @@ class UserFlowTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "测试推荐理由")
+
+    def test_register_creates_user_logs_in_and_redirects_home(self):
+        response = self.client.post(
+            reverse("accounts:register"),
+            {
+                "username": "alice",
+                "password1": "secret12345",
+                "password2": "secret12345",
+            },
+        )
+
+        self.assertRedirects(response, reverse("blog:home"))
+        self.assertTrue(get_user_model().objects.filter(username="alice").exists())
+        self.assertIn("_auth_user_id", self.client.session)
+
+    def test_recommendation_history_requires_login(self):
+        response = self.client.get(reverse("accounts:recommendation_history"))
+
+        self.assertRedirects(
+            response,
+            f"{reverse('accounts:login')}?next={reverse('accounts:recommendation_history')}",
+        )
+
+    def test_recommendation_history_lists_only_current_user_sessions(self):
+        alice = get_user_model().objects.create_user(username="alice", password="secret12345")
+        bob = get_user_model().objects.create_user(username="bob", password="secret12345")
+        alice_session = UserSession.objects.create(selected_category="suspense_crime", user=alice)
+        bob_session = UserSession.objects.create(selected_category="suspense_crime", user=bob)
+        for movie in self.movies[:8]:
+            UserRating.objects.create(session=alice_session, movie=movie, rating=5)
+        RecommendationResult.objects.create(
+            session=alice_session,
+            movie=self.movies[8],
+            score=1.0,
+            rank_order=1,
+            reason="Alice result",
+        )
+        RecommendationResult.objects.create(
+            session=bob_session,
+            movie=self.movies[9],
+            score=1.0,
+            rank_order=1,
+            reason="Bob result",
+        )
+        self.client.force_login(alice)
+
+        response = self.client.get(reverse("accounts:recommendation_history"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Alice result")
+        self.assertContains(response, "8")
+        self.assertNotContains(response, "Bob result")
+
+    def test_recommendation_history_detail_filters_by_current_user(self):
+        alice = get_user_model().objects.create_user(username="alice", password="secret12345")
+        bob = get_user_model().objects.create_user(username="bob", password="secret12345")
+        alice_session = UserSession.objects.create(selected_category="suspense_crime", user=alice)
+        bob_session = UserSession.objects.create(selected_category="suspense_crime", user=bob)
+        UserRating.objects.create(session=alice_session, movie=self.movies[0], rating=5)
+        RecommendationResult.objects.create(
+            session=alice_session,
+            movie=self.movies[1],
+            score=1.0,
+            rank_order=1,
+            reason="Alice detail",
+        )
+        RecommendationResult.objects.create(
+            session=bob_session,
+            movie=self.movies[2],
+            score=1.0,
+            rank_order=1,
+            reason="Bob detail",
+        )
+        self.client.force_login(alice)
+
+        own_response = self.client.get(
+            reverse("accounts:recommendation_history_detail", args=[alice_session.session_key])
+        )
+        other_response = self.client.get(
+            reverse("accounts:recommendation_history_detail", args=[bob_session.session_key])
+        )
+
+        self.assertEqual(own_response.status_code, 200)
+        self.assertContains(own_response, "Alice detail")
+        self.assertContains(own_response, self.movies[0].title)
+        self.assertEqual(other_response.status_code, 404)

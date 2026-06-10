@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">首页</a>
+    &rsaquo; 推荐管理
+    &rsaquo; 推荐反馈
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>推荐反馈分类</h1>
+    <p>先选择推荐分类，再查看该分类下哪些用户提交了反馈。</p>
+    <div class="module">
+        <table>
+            <thead>
+                <tr>
+                    <th>推荐分类</th>
+                    <th>反馈数量</th>
+                    <th>反馈用户数</th>
+                    <th>平均反馈分</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in category_rows %}
+                    <tr>
+                        <th scope="row"><a href="{{ row.url }}">{{ row.label }}</a></th>
+                        <td>{{ row.feedback_count }}</td>
+                        <td>{{ row.user_count }}</td>
+                        <td>{{ row.average_rating|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
