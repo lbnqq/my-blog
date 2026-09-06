@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.conf import settings
 
 from apps.admin_labels import bilingual_label
 from apps.movies.models import Movie
@@ -55,3 +56,42 @@ class RecommendationFeedback(models.Model):
 
     def __str__(self):
         return f"{self.recommendation_result}: {self.rating}"
+
+
+class SyncRun(models.Model):
+    class Source(models.TextChoices):
+        DOUBAN_CHART = "douban_chart", "豆瓣电影排行榜"
+        WEEKLY_REPUTATION = "weekly_reputation", "豆瓣一周口碑榜"
+
+    class Status(models.TextChoices):
+        RUNNING = "running", "执行中"
+        SUCCESS = "success", "成功"
+        SKIPPED = "skipped", "已跳过"
+        FAILED = "failed", "失败"
+
+    source = models.CharField(max_length=32, choices=Source.choices, db_index=True)
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.RUNNING,
+        db_index=True,
+    )
+    updated_count = models.PositiveIntegerField(default=0)
+    message = models.TextField(blank=True)
+    started_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    triggered_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="analytics_sync_runs",
+    )
+
+    class Meta:
+        ordering = ["-started_at"]
+        verbose_name = bilingual_label("数据同步记录", "Data Sync Run")
+        verbose_name_plural = bilingual_label("数据同步记录", "Data Sync Runs")
+
+    def __str__(self):
+        return f"{self.get_source_display()} - {self.get_status_display()}"

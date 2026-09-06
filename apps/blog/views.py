@@ -9,13 +9,22 @@ from apps.blog.services.douban_weekly_reputation import (
     fetch_douban_weekly_reputation_poster,
     get_homepage_weekly_reputation,
 )
+from apps.movies.models import Movie
 from apps.movies.services.daily_movie import get_daily_movie
+
+
+def attach_local_movie_links(items):
+    douban_ids = [item.douban_id for item in items if item.douban_id]
+    local_movies = {movie.douban_id: movie for movie in Movie.objects.filter(douban_id__in=douban_ids)}
+    for item in items:
+        item.local_movie = local_movies.get(item.douban_id)
+    return items
 
 
 def home(request):
     daily_movie = get_daily_movie()
-    weekly_reputation_movies = get_homepage_weekly_reputation(limit=6)
-    douban_chart_movies = get_homepage_douban_chart(limit=6)
+    weekly_reputation_movies = attach_local_movie_links(get_homepage_weekly_reputation(limit=6))
+    douban_chart_movies = attach_local_movie_links(get_homepage_douban_chart(limit=6))
     return render(
         request,
         "blog/home.html",
@@ -30,6 +39,24 @@ def home(request):
 def news_detail(request, pk):
     news = get_object_or_404(UpcomingMovieNews, pk=pk, is_active=True)
     return render(request, "blog/news_detail.html", {"news": news})
+
+
+def douban_chart_detail(request, douban_id):
+    movie = get_object_or_404(DoubanChartMovie, douban_id=douban_id, is_active=True)
+    return render(
+        request,
+        "blog/ranking_detail.html",
+        {"movie": movie, "source_type": "chart", "source_label": "豆瓣电影排行榜"},
+    )
+
+
+def douban_weekly_reputation_detail(request, douban_id):
+    movie = get_object_or_404(DoubanWeeklyReputationMovie, douban_id=douban_id, is_active=True)
+    return render(
+        request,
+        "blog/ranking_detail.html",
+        {"movie": movie, "source_type": "weekly", "source_label": "豆瓣一周口碑榜"},
+    )
 
 
 def douban_chart_poster(request, douban_id):

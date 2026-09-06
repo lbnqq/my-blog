@@ -1,25 +1,32 @@
 {% extends "base.html" %}
-
-{% block title %}选择电影类型{% endblock %}
-
+{% block title %}选择类型 — 个性化推荐{% endblock %}
 {% block content %}
-<section class="page-heading">
-    <p class="kicker">Step 01</p>
-    <h1>先选一种电影气质。</h1>
-    <p class="lead">系统会根据你的选择，展示更适合评分的代表电影，让推荐从一开始就更贴近你的偏好。</p>
-</section>
-
-<form method="post" class="grid">
-    {% csrf_token %}
-    {% for value, label in form.fields.category.choices %}
-        <label class="card choice-card">
-            <input type="radio" name="category" value="{{ value }}" required>
-            <strong>{{ label }}</strong>
-            <span>进入对应评分表，至少评价 8 部电影后生成推荐。</span>
-        </label>
-    {% endfor %}
-    <div class="form-actions">
-        <button class="primary" type="submit">进入评分表</button>
+<header class="page-header">
+    <div class="container">
+        <div class="step-indicator step-indicator--left">
+            <div class="step-indicator__item is-active"><span class="step-indicator__num">1</span><span>选择类型</span></div>
+            <div class="step-indicator__item"><span class="step-indicator__num">2</span><span>偏好打分</span></div>
+            <div class="step-indicator__item"><span class="step-indicator__num">3</span><span>查看结果</span></div>
+        </div>
+        <p class="page-header__step">Step 1 / 3</p>
+        <h1 class="page-header__title">选择你喜欢的电影类型</h1>
+        <p class="page-header__subtitle">选一个方向作为起点，下一步会展示对应的代表电影供你评分。</p>
     </div>
+</header>
+<form method="post" class="container category-form">
+    {% csrf_token %}
+    {% if form.category.errors %}<div class="alert alert--error">{{ form.category.errors }}</div>{% endif %}
+    <div class="category-grid">
+        {% for value, label in form.fields.category.choices %}
+            <label class="category-card">
+                <input class="category-card__input" type="radio" name="category" value="{{ value }}" required>
+                <span class="category-card__index">0{{ forloop.counter }}</span>
+                <span class="category-card__name">{{ label }}</span>
+                <span class="category-card__desc">进入对应评分表<br>至少评价 8 部电影</span>
+            </label>
+        {% endfor %}
+    </div>
+    <div class="category-submit"><button class="btn btn--primary btn--lg" type="submit">进入评分表</button></div>
+    {% if not user.is_authenticated %}<p class="login-hint">登录后，本次推荐会自动保存到“我的推荐”。<a href="{% url 'accounts:login' %}">立即登录</a></p>{% endif %}
 </form>
 {% endblock %}

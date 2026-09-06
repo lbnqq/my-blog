@@ -6,36 +6,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}电影资料馆{% endblock %}</title>
     <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="{% static 'css/site.css' %}">
+    <link rel="stylesheet" href="{% static 'css/site.css' %}?v=20260616-mobile-agent">
+    <link rel="stylesheet" href="{% static 'css/pages.css' %}?v=20260613">
+    <link rel="stylesheet" href="{% static 'css/integration.css' %}?v=20260613.1">
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <header class="site-header">
-        <a class="brand" href="{% url 'blog:home' %}">电影资料馆</a>
-        <nav>
-            <a href="{% url 'blog:home' %}#daily">每日一片</a>
-            <a href="{% url 'blog:home' %}#movie-news">近期片讯</a>
-            <a href="{% url 'ratings:category' %}">个性化推荐</a>
-            {% if user.is_authenticated %}
-                <a href="{% url 'accounts:recommendation_history' %}">我的推荐</a>
-                <form class="nav-logout" method="post" action="{% url 'accounts:logout' %}">
-                    {% csrf_token %}
-                    <button type="submit">退出</button>
-                </form>
-            {% else %}
-                <a href="{% url 'accounts:login' %}">登录</a>
-                <a href="{% url 'accounts:register' %}">注册</a>
-            {% endif %}
-        </nav>
-    </header>
-    <main class="site-main">
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar__inner">
+                <a class="navbar__brand" href="{% url 'blog:home' %}">电影资料馆</a>
+                <ul class="navbar__links">
+                    <li><a class="navbar__link" href="{% url 'blog:home' %}#daily">每日一片</a></li>
+                    <li><a class="navbar__link" href="{% url 'blog:home' %}#movie-news">近期片讯</a></li>
+                    <li><a class="navbar__link{% if '/recommend/' in request.path %} is-active{% endif %}" href="{% url 'ratings:category' %}">个性化推荐</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a class="navbar__link{% if '/accounts/recommendations/' in request.path %} is-active{% endif %}" href="{% url 'accounts:recommendation_history' %}">我的推荐</a></li>
+                    {% else %}
+                        <li><a class="navbar__link{% if '/accounts/login/' in request.path %} is-active{% endif %}" href="{% url 'accounts:login' %}">登录</a></li>
+                    {% endif %}
+                </ul>
+                <div class="navbar__actions hide-mobile">
+                    {% if user.is_authenticated %}
+                        {% if user.is_staff %}<a class="navbar__link" href="{% url 'recommendations:analytics' %}">算法统计</a>{% endif %}
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button class="btn btn--ghost btn--sm" type="submit">退出</button>
+                        </form>
+                    {% else %}
+                        <a class="btn btn--ghost btn--sm" href="{% url 'accounts:register' %}">注册</a>
+                        <a class="btn btn--primary btn--sm" href="{% url 'ratings:category' %}">开始推荐</a>
+                    {% endif %}
+                </div>
+                <button class="navbar__hamburger" type="button" aria-label="打开菜单" aria-expanded="false" data-menu-toggle>
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+            </div>
+        </div>
+        <div class="navbar__mobile-menu" data-mobile-menu>
+            <ul class="navbar__mobile-links">
+                <li><a class="navbar__mobile-link" href="{% url 'blog:home' %}#daily">每日一片</a></li>
+                <li><a class="navbar__mobile-link" href="{% url 'blog:home' %}#movie-news">近期片讯</a></li>
+                <li><a class="navbar__mobile-link" href="{% url 'ratings:category' %}">个性化推荐</a></li>
+                {% if user.is_authenticated %}
+                    <li><a class="navbar__mobile-link" href="{% url 'accounts:recommendation_history' %}">我的推荐</a></li>
+                    {% if user.is_staff %}<li><a class="navbar__mobile-link" href="{% url 'recommendations:analytics' %}">算法统计</a></li>{% endif %}
+                    <li><form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="btn btn--ghost btn--full" type="submit">退出</button></form></li>
+                {% else %}
+                    <li><a class="navbar__mobile-link" href="{% url 'accounts:login' %}">登录</a></li>
+                    <li><a class="navbar__mobile-link" href="{% url 'accounts:register' %}">注册</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <main>
         {% if messages %}
-            <div class="messages">
+            <div class="container messages">
                 {% for message in messages %}
-                    <p class="message {{ message.tags }}">{{ message }}</p>
+                    <p class="alert alert--{{ message.tags|default:'info' }}">{{ message }}</p>
                 {% endfor %}
             </div>
         {% endif %}
         {% block content %}{% endblock %}
     </main>
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__brand">电影资料馆</div>
+            <p>© 2026 电影资料馆 · 仅供学习交流使用</p>
+        </div>
+    </footer>
+    <section
+        class="movie-agent"
+        data-agent
+        data-chat-url="{% url 'agent:chat' %}"
+        data-confirm-url="{% url 'agent:confirm_action' %}"
+    >
+        <button class="movie-agent__toggle" type="button" aria-expanded="false" data-agent-toggle>
+            <span class="movie-agent__toggle-icon">AI</span>
+            <span>电影助手</span>
+        </button>
+        <div class="movie-agent__panel" data-agent-panel hidden>
+            <div class="movie-agent__header">
+                <div>
+                    <strong>电影助手</strong>
+                    <span>问我博客、榜单和推荐</span>
+                </div>
+                <button class="movie-agent__close" type="button" aria-label="关闭电影助手" data-agent-close>×</button>
+            </div>
+            <div class="movie-agent__messages" data-agent-messages aria-live="polite">
+                <div class="movie-agent__message movie-agent__message--bot">
+                    你好，我是这个博客的站内助手。你可以问我这个博客是干什么的、当前榜单有哪些，或者让我带你做电影推荐。
+                </div>
+            </div>
+            <div class="movie-agent__quick">
+                <button type="button" data-agent-quick="这个博客是干什么的？">博客介绍</button>
+                <button type="button" data-agent-quick="一周口碑榜和排行榜有哪些？">当前榜单</button>
+                <button type="button" data-agent-quick="我要电影推荐">电影推荐</button>
+                <button type="button" data-agent-quick="更新榜单">更新榜单</button>
+            </div>
+            <form class="movie-agent__form" data-agent-form>
+                {% csrf_token %}
+                <input name="message" type="text" autocomplete="off" placeholder="输入你的问题..." data-agent-input>
+                <button type="submit">发送</button>
+            </form>
+        </div>
+    </section>
+    <script src="{% static 'js/site.js' %}?v=20260613.1" defer></script>
+    <script src="{% static 'js/agent.js' %}?v=20260616" defer></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

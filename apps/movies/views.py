@@ -1,21 +1,16 @@
-import urllib.error
-import urllib.request
-
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 
+from apps.blog.services.poster_fetcher import fetch_douban_poster
 from apps.movies.models import Movie
 from apps.movies.services.daily_movie import get_related_movies
+from apps.movies.templatetags.movie_posters import poster_cache_path
 
 
 def fetch_movie_poster(movie):
-    request = urllib.request.Request(
+    return fetch_douban_poster(
         movie.poster_url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Referer": "https://movie.douban.com/",
-        },
+        f"https://movie.douban.com/subject/{movie.douban_id}/",
     )
     with urllib.request.urlopen(request, timeout=15) as response:
         content_type = response.headers.get("Content-Type", "image/jpeg").split(";")[0]
@@ -41,8 +36,12 @@ def movie_poster(request, pk):
         raise Http404("Movie poster is missing.")
     try:
         content, content_type = fetch_movie_poster(movie)
-    except (OSError, urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+    except (OSError, TimeoutError) as exc:
         raise Http404("Movie poster could not be loaded.") from exc
+    target_path = poster_cache_path(movie)
+    if target_path is not None:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        target_path.write_bytes(content)
     response = HttpResponse(content, content_type=content_type)
     response["Cache-Control"] = "public, max-age=86400"
     return response

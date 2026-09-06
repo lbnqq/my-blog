@@ -1,4 +1,5 @@
 import datetime
+import urllib.error
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -145,6 +146,51 @@ class DoubanChartSyncTests(TestCase):
         existing.refresh_from_db()
         self.assertTrue(existing.is_active)
 
+    def test_sync_chart_reports_failure_when_only_stale_cache_is_available(self):
+        from apps.blog.services.douban_chart import sync_douban_chart
+
+        existing = DoubanChartMovie.objects.create(
+            douban_id="cached-chart",
+            rank=1,
+            title="缓存榜单电影",
+            rating=Decimal("8.8"),
+            rating_count=5000,
+            subject_url="https://movie.douban.com/subject/1/",
+            fetched_at=timezone.now() - datetime.timedelta(days=10),
+        )
+
+        def unavailable():
+            raise urllib.error.URLError("SSL handshake failed")
+
+        result = sync_douban_chart(fetch_html=unavailable, force=True)
+
+        self.assertEqual(result.status, "failed")
+        self.assertEqual(result.updated_count, 0)
+        self.assertIn("缓存", result.message)
+        self.assertIn("SSL handshake failed", result.message)
+        existing.refresh_from_db()
+        self.assertTrue(existing.is_active)
+
+    def test_sync_chart_uses_recent_cache_when_live_fetch_is_unavailable(self):
+        from apps.blog.services.douban_chart import sync_douban_chart
+
+        DoubanChartMovie.objects.create(
+            douban_id="recent-cached-chart",
+            rank=1,
+            title="Recent cached chart",
+            rating=Decimal("8.8"),
+            rating_count=5000,
+            subject_url="https://movie.douban.com/subject/3/",
+            fetched_at=timezone.now() - datetime.timedelta(days=1),
+        )
+
+        def unavailable():
+            raise urllib.error.URLError("SSL handshake failed")
+
+        result = sync_douban_chart(fetch_html=unavailable, force=True)
+
+        self.assertEqual(result.status, "skipped")
+
 
 class DoubanChartCommandTests(TestCase):
     def test_management_command_forwards_force_option(self):
@@ -177,7 +223,7 @@ class DoubanChartHomepageTests(TestCase):
             feature_tags=["剧情"],
         )
 
-    def test_homepage_shows_douban_chart_movies_with_external_detail_links(self):
+    def test_homepage_shows_douban_chart_movies_with_local_detail_links(self):
         self.make_daily_movie()
         for index in range(1, 8):
             DoubanChartMovie.objects.create(
@@ -199,10 +245,16 @@ class DoubanChartHomepageTests(TestCase):
         self.assertContains(response, "豆瓣电影排行榜")
         self.assertContains(response, "榜单电影 1")
         self.assertContains(response, "10001人评价")
-        self.assertContains(response, 'href="https://movie.douban.com/subject/1/"')
+        self.assertContains(response, reverse("blog:douban_chart_detail", args=["chart-1"]))
         self.assertContains(response, reverse("blog:douban_chart_poster", args=["chart-1"]))
         self.assertNotContains(response, "榜单电影 7")
         self.assertNotContains(response, reverse("blog:news_detail", args=[1]))
+
+        detail_response = self.client.get(reverse("blog:douban_chart_detail", args=["chart-1"]))
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, "榜单电影 1")
+        self.assertContains(detail_response, "豆瓣 8.5")
+        self.assertContains(detail_response, 'href="https://movie.douban.com/subject/1/"')
 
     def test_douban_chart_poster_proxy_streams_remote_poster(self):
         DoubanChartMovie.objects.create(

@@ -1,42 +1,18 @@
 {% extends "base.html" %}
-
-{% block title %}推荐算法统计{% endblock %}
-
+{% block title %}推荐统计 — 电影资料馆{% endblock %}
 {% block content %}
-<section class="page-heading">
-    <p class="kicker">Analytics</p>
-    <h1>推荐算法统计</h1>
-    <p class="lead">根据用户对推荐电影的反馈评分，查看算法覆盖率、满意度和不同排名区间的效果。</p>
-</section>
-
-<section class="analytics-grid">
-    <article class="card metric-card">
-        <span>推荐结果总数</span>
-        <strong>{{ metrics.total_count }}</strong>
-    </article>
-    <article class="card metric-card">
-        <span>反馈数</span>
-        <strong>{{ metrics.feedback_count }}</strong>
-    </article>
-    <article class="card metric-card">
-        <span>反馈覆盖率</span>
-        <strong>{{ metrics.coverage_rate|floatformat:1 }}%</strong>
-    </article>
-    <article class="card metric-card">
-        <span>平均反馈分</span>
-        <strong>{{ metrics.average_rating|floatformat:2 }}</strong>
-    </article>
-    <article class="card metric-card">
-        <span>好评率</span>
-        <strong>{{ metrics.positive_rate|floatformat:1 }}%</strong>
-    </article>
-    <article class="card metric-card">
-        <span>差评率</span>
-        <strong>{{ metrics.negative_rate|floatformat:1 }}%</strong>
-    </article>
-</section>
-
-{% include "recommendations/analytics_table.html" with title="按推荐排名分组" rows=rank_rows %}
-{% include "recommendations/analytics_table.html" with title="按算法版本分组" rows=algorithm_rows %}
-{% include "recommendations/analytics_table.html" with title="按推荐分类分组" rows=category_rows %}
+<header class="analytics-header"><div class="container"><p class="page-header__step">推荐统计</p><h1>算法效果分析</h1><p>根据用户对推荐电影的反馈，查看覆盖率、满意度以及不同排名和版本的效果。</p></div></header>
+<div class="container analytics-content">
+    <section class="analytics-grid">
+        <article class="kpi-card"><div class="kpi-card__label">推荐结果总数</div><div class="kpi-card__value">{{ metrics.total_count }}</div><div class="kpi-card__sub">全部推荐电影</div></article>
+        <article class="kpi-card"><div class="kpi-card__label">反馈数</div><div class="kpi-card__value">{{ metrics.feedback_count }}</div><div class="kpi-card__sub">已收到用户评价</div></article>
+        <article class="kpi-card"><div class="kpi-card__label">反馈覆盖率</div><div class="kpi-card__value">{{ metrics.coverage_rate|floatformat:1 }}%</div><div class="kpi-card__sub"><span class="mini-bar"><span class="mini-bar__fill" style="width:{{ metrics.coverage_rate }}%"></span></span></div></article>
+        <article class="kpi-card"><div class="kpi-card__label">平均反馈分</div><div class="kpi-card__value">{{ metrics.average_rating|floatformat:2 }}</div><div class="kpi-card__sub">满分 5 分</div></article>
+        <article class="kpi-card"><div class="kpi-card__label">好评率</div><div class="kpi-card__value">{{ metrics.positive_rate|floatformat:1 }}%</div><div class="kpi-card__sub">评分 ≥ 4</div></article>
+        <article class="kpi-card"><div class="kpi-card__label">差评率</div><div class="kpi-card__value">{{ metrics.negative_rate|floatformat:1 }}%</div><div class="kpi-card__sub">评分 ≤ 2</div></article>
+    </section>
+    {% include "recommendations/analytics_table.html" with title="按推荐排名" rows=rank_rows %}
+    {% include "recommendations/analytics_table.html" with title="按算法版本" rows=algorithm_rows %}
+    {% include "recommendations/analytics_table.html" with title="按推荐分类" rows=category_rows %}
+</div>
 {% endblock %}

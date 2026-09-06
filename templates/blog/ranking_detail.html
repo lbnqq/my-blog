@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }} — 电影资料馆{% endblock %}
+
+{% block content %}
+<section class="detail-hero news-hero">
+    <div class="container">
+        <div class="detail-hero__inner">
+            <div>
+                {% if movie.poster_url %}
+                    {% if source_type == "weekly" %}
+                        <img class="detail-hero__poster" src="{% url 'blog:douban_weekly_reputation_poster' movie.douban_id %}?v={{ movie.updated_at|date:'U' }}" alt="{{ movie.title }}海报">
+                    {% else %}
+                        <img class="detail-hero__poster" src="{% url 'blog:douban_chart_poster' movie.douban_id %}?v={{ movie.updated_at|date:'U' }}" alt="{{ movie.title }}海报">
+                    {% endif %}
+                {% else %}
+                    <div class="poster-fallback detail-hero__poster">{{ movie.title }}</div>
+                {% endif %}
+            </div>
+            <div class="detail-hero__info">
+                <p class="page-header__step">{{ source_label }}</p>
+                <h1 class="detail-hero__cn-title">{{ movie.title }}</h1>
+                {% if movie.subtitle %}<p class="detail-hero__en-title">{{ movie.subtitle }}</p>{% endif %}
+                <div class="detail-hero__badges">
+                    <span class="badge badge--accent">榜单第 {{ movie.rank }}</span>
+                    {% if movie.rating %}<span class="badge badge--outline">豆瓣 {{ movie.rating }}</span>{% endif %}
+                    {% if movie.rating_count %}<span class="badge badge--outline">{{ movie.rating_count }} 人评价</span>{% endif %}
+                </div>
+                {% if movie.info_text %}
+                    <p class="detail-hero__desc-text">{{ movie.info_text }}</p>
+                {% else %}
+                    <p class="detail-hero__desc-text">这部电影来自{{ source_label }}，当前本地缓存暂未包含更完整的剧情简介。</p>
+                {% endif %}
+                <div class="detail-hero__actions">
+                    <a class="btn btn--primary" href="{% url 'blog:home' %}#movie-news">返回榜单</a>
+                    <a class="btn btn--ghost hero__ghost" href="{{ movie.subject_url }}" target="_blank" rel="noopener">查看资料来源</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

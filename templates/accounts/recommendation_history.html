@@ -1,41 +1,21 @@
 {% extends "base.html" %}
-
-{% block title %}我的推荐{% endblock %}
-
+{% block title %}我的推荐 — 电影资料馆{% endblock %}
 {% block content %}
-<section class="page-heading">
-    <p class="kicker">History</p>
-    <h1>我的推荐</h1>
-    <p class="lead">这里保存了你登录后完成的评分记录和系统推荐片单。</p>
-</section>
-
+<header class="history-header"><div class="container"><p class="page-header__step">我的推荐</p><h1>历史记录</h1><p>这里保存了你登录后完成的偏好评分和系统推荐片单。</p></div></header>
+<div class="container history-content">
 {% if sessions %}
-    <div class="movie-list">
-        {% for session in sessions %}
-            <article class="card history-card">
-                <div>
-                    <h2>{{ session.category_label }}</h2>
-                    <p class="meta">
-                        创建时间：{{ session.created_at|date:"Y-m-d H:i" }}
-                        {% if session.completed_at %} · 完成时间：{{ session.completed_at|date:"Y-m-d H:i" }}{% endif %}
-                    </p>
-                    <p>评分数量：{{ session.rating_count }}</p>
-                    {% with first_result=session.recommendation_results.all|first %}
-                        {% if first_result %}
-                            <p>推荐预览：{{ first_result.movie.title }} · {{ first_result.reason }}</p>
-                        {% else %}
-                            <p>暂未生成推荐结果。</p>
-                        {% endif %}
-                    {% endwith %}
-                </div>
-                <a class="button primary" href="{% url 'accounts:recommendation_history_detail' session.session_key %}">查看详情</a>
-            </article>
-        {% endfor %}
+    <div class="history-list">
+    {% for session in sessions %}
+        <a class="history-card" href="{% url 'accounts:recommendation_history_detail' session.session_key %}">
+            <div class="history-card__date"><strong>{{ session.created_at|date:"d" }}</strong><span>{{ session.created_at|date:"Y.m" }}</span></div>
+            <div class="history-card__body"><span class="history-card__category">{{ session.category_label }}</span><h2>{{ session.category_label }}个性化推荐</h2><p>评分 {{ session.rating_count }} 部电影{% if session.completed_at %} · 完成于 {{ session.completed_at|date:"Y-m-d H:i" }}{% endif %}</p>{% with first_result=session.recommendation_results.all|first %}{% if first_result %}<span class="history-card__preview">推荐预览：{{ first_result.movie.title }} · {{ first_result.reason }}</span>{% else %}<span class="history-card__preview">暂未生成推荐结果</span>{% endif %}{% endwith %}</div>
+            <span class="history-card__arrow" aria-hidden="true">→</span>
+        </a>
+    {% endfor %}
     </div>
 {% else %}
-    <p class="message">你还没有登录后完成的推荐记录。</p>
-    <p class="form-actions">
-        <a class="button primary" href="{% url 'ratings:category' %}">开始个性化推荐</a>
-    </p>
+    <div class="empty-state"><h2>还没有推荐记录</h2><p>完成一次个性化推荐后，评分与片单会出现在这里。</p><a class="btn btn--primary btn--lg" href="{% url 'ratings:category' %}">开始新推荐</a></div>
 {% endif %}
+<div class="history-new"><a class="btn btn--primary btn--lg" href="{% url 'ratings:category' %}">开始新推荐</a></div>
+</div>
 {% endblock %}

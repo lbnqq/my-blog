@@ -6,7 +6,18 @@ from django.urls import path, reverse
 
 from apps.movies.services.classifier import CATEGORY_LABELS
 
-from .models import RecommendationFeedback, RecommendationResult
+from .models import RecommendationFeedback, RecommendationResult, SyncRun
+
+
+@admin.register(SyncRun)
+class SyncRunAdmin(admin.ModelAdmin):
+    list_display = ("source", "status", "updated_count", "triggered_by", "started_at", "finished_at")
+    list_filter = ("source", "status", "started_at")
+    search_fields = ("message", "triggered_by__username")
+    readonly_fields = ("source", "status", "updated_count", "message", "triggered_by", "started_at", "finished_at")
+
+    def has_add_permission(self, request):
+        return False
 
 
 @admin.register(RecommendationResult)

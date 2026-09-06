@@ -105,7 +105,7 @@ class MovieBlogHomepageTests(TestCase):
         self.assertNotContains(response, "国外预告")
         self.assertContains(response, reverse("ratings:category"))
 
-    def test_douban_chart_homepage_links_open_douban_subject_pages(self):
+    def test_douban_chart_homepage_links_open_local_ranking_detail_pages(self):
         from apps.blog.models import DoubanChartMovie
 
         self.make_movie(1)
@@ -121,7 +121,7 @@ class MovieBlogHomepageTests(TestCase):
 
         response = self.client.get(reverse("blog:home"))
 
-        self.assertContains(response, 'href="https://movie.douban.com/subject/37116612/"')
+        self.assertContains(response, reverse("blog:douban_chart_detail", args=["37116612"]))
         self.assertNotContains(response, reverse("blog:news_detail", args=[1]))
 
     def test_news_detail_page_shows_news_information(self):

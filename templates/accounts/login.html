@@ -1,27 +1,25 @@
 {% extends "base.html" %}
-
-{% block title %}登录{% endblock %}
-
+{% block title %}登录 — 电影资料馆{% endblock %}
 {% block content %}
-<section class="page-heading">
-    <p class="kicker">Account</p>
-    <h1>登录</h1>
-    <p class="lead">登录后生成的个性化推荐会自动归档到你的账号。</p>
-</section>
-
-<form method="post" class="card auth-form">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    {% for field in form %}
-        <label>
-            <span>{{ field.label }}</span>
-            {{ field }}
-            {{ field.errors }}
-        </label>
-    {% endfor %}
-    <div class="form-actions">
-        <button class="primary" type="submit">登录</button>
-        <a class="button" href="{% url 'accounts:register' %}">注册新账号</a>
+<section class="auth-page">
+    <div class="auth-card">
+        <div class="auth-card__brand"><span class="auth-card__brand-name">电影资料馆</span><span class="auth-card__brand-sub">Movie Archive</span></div>
+        <h1 class="auth-card__title">登录账号</h1>
+        <p class="auth-card__subtitle">登录后生成的推荐会自动保存到你的历史记录。</p>
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            {% if form.non_field_errors %}<div class="alert alert--error">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<p class="form-error">{{ error }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+            <button class="btn btn--primary btn--full btn--lg" type="submit">登录</button>
+        </form>
+        <p class="auth-card__footer">没有账号？<a href="{% url 'accounts:register' %}">注册新账号</a></p>
     </div>
-</form>
+</section>
 {% endblock %}

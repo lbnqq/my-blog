@@ -1,58 +1,23 @@
 {% extends "base.html" %}
-
-{% block title %}推荐结果{% endblock %}
-
+{% load movie_posters %}
+{% block title %}推荐结果 — 个性化推荐{% endblock %}
 {% block content %}
-<section class="page-heading">
-    <p class="kicker">Step 03</p>
-    <h1>为你整理好的片单。</h1>
-    <p class="lead">根据你选择的 {{ category_label }} 偏好和评分结果，系统生成以下 Top20 推荐。看过或了解这些电影后，也可以给推荐结果打分，帮助我们评估算法是否有效。</p>
-</section>
-
+<header class="result-header"><div class="container"><p class="page-header__step">Step 3 / 3 · {{ category_label }}</p><h1 class="result-header__title">你的 Top20 推荐片单</h1><p class="result-header__subtitle">推荐来自你的偏好评分。为推荐电影补充反馈，可以帮助我们持续评估算法效果。</p></div></header>
+<div class="container results-content">
 {% if results %}
-    <form method="post">
-        {% csrf_token %}
-        <div class="movie-list">
-            {% for result in results %}
-                <article class="card movie-card">
-                    <div>
-                        <h2>{{ result.movie.title }}</h2>
-                        <p class="meta">{{ result.movie.year }} · {{ result.movie.genres|join:" / " }} · 豆瓣 {{ result.movie.rating }}</p>
-                        <p>{{ result.reason }}</p>
-                        <p class="score">推荐得分：{{ result.score|floatformat:3 }}</p>
-                        <div class="feedback-block">
-                            <strong>推荐反馈</strong>
-                            <span>这部推荐符合你的口味吗？</span>
-                            <div class="rating-row" aria-label="{{ result.movie.title }}推荐反馈">
-                                {% for value in rating_values %}
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="feedback_{{ result.id }}"
-                                            value="{{ value }}"
-                                            {% if result.feedback_rating == value %}checked{% endif %}
-                                        >
-                                        {{ value }}
-                                    </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="rank">#{{ result.rank_order|stringformat:"02d" }}</div>
-                </article>
-            {% endfor %}
+    <form method="post">{% csrf_token %}
+        <div class="result-list">
+        {% for result in results %}
+            <article class="result-card">
+                <div class="result-card__rank"><span>#</span>{{ result.rank_order|stringformat:"02d" }}</div>
+                <div class="result-card__poster-wrap">{% with poster_url=result.movie|cached_poster_url %}{% if poster_url %}<img class="result-card__poster" src="{{ poster_url }}" alt="{{ result.movie.title }}海报" loading="lazy">{% else %}<span class="poster-fallback">{{ result.movie.title }}</span>{% endif %}{% endwith %}</div>
+                <div class="result-card__body"><h2 class="result-card__title">{{ result.movie.title }}</h2><p class="result-card__meta">{{ result.movie.year }} · {{ result.movie.genres|join:" / " }} · 豆瓣 {{ result.movie.rating }}</p><p class="result-card__reason">{{ result.reason }}</p><span class="result-card__score">推荐得分 {{ result.score|floatformat:3 }}</span></div>
+                <div class="result-card__feedback"><strong>推荐反馈</strong><span>符合你的口味吗？</span><fieldset class="star-input star-input--compact" aria-label="{{ result.movie.title }}推荐反馈"><legend class="sr-only">为 {{ result.movie.title }} 的推荐效果评分</legend>{% for value in rating_values %}<label title="{{ value }} 分"><input type="radio" name="feedback_{{ result.id }}" value="{{ value }}" {% if result.feedback_rating == value %}checked{% endif %}><span aria-hidden="true">★</span><span class="sr-only">{{ value }} 分</span></label>{% endfor %}</fieldset></div>
+            </article>
+        {% endfor %}
         </div>
-        <div class="form-actions">
-            <button class="primary" type="submit">保存推荐反馈</button>
-            <a class="button" href="{% url 'ratings:category' %}">重新测试</a>
-            <a class="button" href="{% url 'blog:home' %}">返回首页</a>
-        </div>
+        <div class="result-actions"><button class="btn btn--primary" type="submit">保存推荐反馈</button><a class="btn btn--ghost" href="{% url 'ratings:category' %}">重新测试</a><a class="btn btn--dark" href="{% url 'blog:home' %}">返回首页</a></div>
     </form>
-{% else %}
-    <p class="message">暂无推荐结果，请先完成评分。</p>
-    <p class="form-actions">
-        <a class="button primary" href="{% url 'ratings:category' %}">重新测试</a>
-        <a class="button" href="{% url 'blog:home' %}">返回首页</a>
-    </p>
-{% endif %}
+{% else %}<div class="empty-state"><h2>暂无推荐结果</h2><p>请先完成评分，再生成你的推荐片单。</p><a class="btn btn--primary" href="{% url 'ratings:category' %}">重新测试</a></div>{% endif %}
+</div>
 {% endblock %}

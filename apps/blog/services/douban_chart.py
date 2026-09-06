@@ -10,6 +10,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.blog.models import DoubanChartMovie
+from apps.blog.services.poster_fetcher import fetch_douban_poster
 
 
 DOUBAN_CHART_URL = "https://movie.douban.com/chart"
@@ -184,17 +185,7 @@ def fetch_douban_chart_html():
 
 
 def fetch_douban_chart_poster(movie):
-    request = urllib.request.Request(
-        movie.poster_url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Referer": movie.subject_url,
-        },
-    )
-    with urllib.request.urlopen(request, timeout=15) as response:
-        content_type = response.headers.get("Content-Type", "image/jpeg").split(";")[0]
-        return response.read(), content_type
+    return fetch_douban_poster(movie.poster_url, movie.subject_url)
 
 
 def get_homepage_douban_chart(limit=6):
@@ -215,6 +206,20 @@ def sync_douban_chart(fetch_html=fetch_douban_chart_html, force=False):
     try:
         entries = parse_douban_chart(fetch_html())
     except (OSError, urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+        cached_count = DoubanChartMovie.objects.filter(is_active=True).count()
+        cache_is_recent = latest_fetch and timezone.now() - latest_fetch < SYNC_INTERVAL
+        if cached_count and cache_is_recent:
+            return DoubanChartSyncResult(
+                "skipped",
+                0,
+                f"豆瓣暂时无法连接，继续使用现有 {cached_count} 条缓存榜单数据。网络原因：{exc}",
+            )
+        if cached_count:
+            return DoubanChartSyncResult(
+                "failed",
+                0,
+                f"豆瓣同步失败，现有 {cached_count} 条榜单缓存已过期但仍保留。网络原因：{exc}",
+            )
         return DoubanChartSyncResult("failed", 0, f"Failed to fetch Douban chart: {exc}")
 
     if not entries:

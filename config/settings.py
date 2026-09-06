@@ -18,10 +18,20 @@ def split_env_list(name, default=""):
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
+def env_flag(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.lower() in {"1", "true", "yes", "on"}
+
+
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
-DEBUG = os.getenv("DEBUG", "True").lower() in {"1", "true", "yes", "on"}
+DEBUG = env_flag("DEBUG", True)
 ALLOWED_HOSTS = split_env_list("ALLOWED_HOSTS", "127.0.0.1,localhost")
 CSRF_TRUSTED_ORIGINS = split_env_list("CSRF_TRUSTED_ORIGINS")
+ALLOW_LAN_ACCESS = env_flag("ALLOW_LAN_ACCESS")
+if DEBUG and ALLOW_LAN_ACCESS and "*" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("*")
 
 
 INSTALLED_APPS = [
@@ -31,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.agent",
     "apps.accounts",
     "apps.blog",
     "apps.movies",
@@ -125,3 +136,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "blog:home"
 LOGOUT_REDIRECT_URL = "blog:home"
+ZHIPU_API_KEY = os.getenv("ZHIPU_API_KEY", "")
+ZHIPU_MODEL = os.getenv("ZHIPU_MODEL", "glm-5.1")
+ZHIPU_API_URL = os.getenv(
+    "ZHIPU_API_URL",
+    "https://open.bigmodel.cn/api/paas/v4/chat/completions",
+)
+FEISHU_APP_ID = os.getenv("FEISHU_APP_ID", "")
+FEISHU_APP_SECRET = os.getenv("FEISHU_APP_SECRET", "")
+FEISHU_VERIFICATION_TOKEN = os.getenv("FEISHU_VERIFICATION_TOKEN", "")
+FEISHU_ENCRYPT_KEY = os.getenv("FEISHU_ENCRYPT_KEY", "")
+SITE_PUBLIC_URL = os.getenv("SITE_PUBLIC_URL", "")

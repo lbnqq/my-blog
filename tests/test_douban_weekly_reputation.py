@@ -164,6 +164,7 @@ class DoubanWeeklyReputationFetchTests(TestCase):
         self.assertEqual(html, CHART_HTML)
         command = run.call_args.args[0]
         self.assertEqual(command[0], "curl")
+        self.assertIn("-sS", command)
         self.assertIn("https://movie.douban.com/chart", command)
 
 
@@ -243,6 +244,53 @@ class DoubanWeeklyReputationSyncTests(TestCase):
         existing.refresh_from_db()
         self.assertTrue(existing.is_active)
 
+    def test_sync_weekly_reports_failure_when_only_stale_cache_is_available(self):
+        from apps.blog.services.douban_weekly_reputation import sync_douban_weekly_reputation
+
+        existing = DoubanWeeklyReputationMovie.objects.create(
+            douban_id="cached-weekly",
+            rank=1,
+            title="缓存口碑电影",
+            rating=Decimal("8.7"),
+            rating_count=4000,
+            subject_url="https://movie.douban.com/subject/2/",
+            fetched_at=timezone.now() - datetime.timedelta(days=10),
+        )
+
+        def unavailable():
+            raise urllib.error.URLError("SSL handshake failed")
+
+        result = sync_douban_weekly_reputation(fetch_chart_html=unavailable, force=True)
+
+        self.assertEqual(result.status, "failed")
+        self.assertEqual(result.updated_count, 0)
+        self.assertIn("缓存", result.message)
+        self.assertIn("SSL handshake failed", result.message)
+        existing.refresh_from_db()
+        self.assertTrue(existing.is_active)
+
+    def test_sync_weekly_uses_recent_cache_when_live_fetch_is_unavailable(self):
+        from apps.blog.services.douban_weekly_reputation import sync_douban_weekly_reputation
+
+        DoubanWeeklyReputationMovie.objects.create(
+            douban_id="recent-cached-weekly",
+            rank=1,
+            title="Recent cached weekly",
+            rating=Decimal("8.7"),
+            rating_count=4000,
+            subject_url="https://movie.douban.com/subject/4/",
+            fetched_at=timezone.now() - datetime.timedelta(days=1),
+        )
+
+        def unavailable():
+            raise urllib.error.URLError("SSL handshake failed")
+
+        result = sync_douban_weekly_reputation(
+            fetch_chart_html=unavailable, force=True
+        )
+
+        self.assertEqual(result.status, "skipped")
+
 
 class DoubanWeeklyReputationCommandTests(TestCase):
     def test_management_command_forwards_force_option(self):
@@ -300,11 +348,17 @@ class DoubanWeeklyReputationHomepageTests(TestCase):
         self.assertContains(response, "口碑电影 1")
         self.assertContains(response, "20001人评价")
         self.assertContains(response, reverse("blog:douban_weekly_reputation_poster", args=["weekly-1"]))
-        self.assertContains(response, 'href="https://movie.douban.com/subject/1/"')
+        self.assertContains(response, reverse("blog:douban_weekly_reputation_detail", args=["weekly-1"]))
         self.assertNotContains(response, "近期预告")
         self.assertNotContains(response, "国内预告")
         self.assertNotContains(response, "国外预告")
         self.assertNotContains(response, "口碑电影 7")
+
+        detail_response = self.client.get(reverse("blog:douban_weekly_reputation_detail", args=["weekly-1"]))
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, "口碑电影 1")
+        self.assertContains(detail_response, "豆瓣 8.5")
+        self.assertContains(detail_response, 'href="https://movie.douban.com/subject/1/"')
 
     def test_weekly_reputation_poster_proxy_streams_remote_poster(self):
         DoubanWeeklyReputationMovie.objects.create(

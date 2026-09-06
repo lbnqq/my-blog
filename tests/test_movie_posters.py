@@ -68,3 +68,15 @@ class MoviePosterTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "image/webp")
         self.assertEqual(response.content, b"poster-bytes")
+
+    @override_settings(STATICFILES_DIRS=[settings.BASE_DIR / "tests" / "fixtures" / "static"])
+    def test_movie_poster_proxy_caches_successful_download(self):
+        movie = self.make_movie()
+        poster_path = Path(settings.STATICFILES_DIRS[0]) / "img" / "posters" / "1292052.webp"
+        self.addCleanup(lambda: poster_path.unlink(missing_ok=True))
+
+        with patch("apps.movies.views.fetch_movie_poster", return_value=(b"poster-bytes", "image/webp")):
+            response = self.client.get(reverse("movies:poster", args=[movie.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(poster_path.read_bytes(), b"poster-bytes")

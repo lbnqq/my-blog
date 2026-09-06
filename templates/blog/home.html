@@ -1,152 +1,102 @@
 {% extends "base.html" %}
 {% load movie_posters %}
 
-{% block title %}电影资料馆{% endblock %}
+{% block title %}电影资料馆 — 发现你的下一部好电影{% endblock %}
 
 {% block content %}
-<section class="magazine-hero" id="daily">
+<section class="hero" id="daily">
     {% if daily_movie %}
-        <article class="daily-feature">
-            <div class="poster-frame">
-                {% with poster_url=daily_movie|cached_poster_url %}
-                {% if poster_url %}
-                    <img src="{{ poster_url }}" alt="{{ daily_movie.title }} poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-                    <div class="poster-fallback is-hidden">{{ daily_movie.title }}</div>
-                {% else %}
-                    <div class="poster-fallback">{{ daily_movie.title }}</div>
-                {% endif %}
-                {% endwith %}
+        <div class="hero__bg">
+            {% with poster_url=daily_movie|cached_poster_url %}
+                {% if poster_url %}<img src="{{ poster_url }}" alt="" aria-hidden="true" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';"><div class="poster-fallback is-hidden">{{ daily_movie.title }}</div>{% endif %}
+            {% endwith %}
+        </div>
+        <div class="hero__overlay"></div>
+        <div class="hero__content">
+            <span class="hero__eyebrow">今日电影推荐</span>
+            <h1 class="hero__title">{{ daily_movie.title }}{% if daily_movie.original_title %}<br><span>{{ daily_movie.original_title }}</span>{% endif %}</h1>
+            <div class="hero__meta">
+                {% if daily_movie.year %}<span class="hero__meta-item">{{ daily_movie.year }}</span>{% endif %}
+                <span class="hero__meta-item">{{ daily_movie.genres|join:" / " }}</span>
+                {% if daily_movie.directors %}<span class="hero__meta-item">导演：{{ daily_movie.directors|join:" / " }}</span>{% endif %}
+                {% if daily_movie.rank %}<span class="hero__badge hero__badge--rank">豆瓣 Top {{ daily_movie.rank }}</span>{% endif %}
+                <span class="hero__badge hero__badge--score">豆瓣 {{ daily_movie.rating }}</span>
             </div>
-            <div class="daily-copy">
-                <p class="eyebrow">Douban Top100 / Daily Film</p>
-                <p class="kicker">今日电影推荐</p>
-                <h1>{{ daily_movie.title }}</h1>
-                {% if daily_movie.original_title %}
-                    <p class="original-title">{{ daily_movie.original_title }}</p>
-                {% endif %}
-                <p class="lead">{{ daily_movie.summary|truncatechars:220 }}</p>
-                <div class="fact-row">
-                    <span>#{{ daily_movie.rank|stringformat:"03d" }}</span>
-                    <span>{{ daily_movie.year }}</span>
-                    <span>豆瓣 {{ daily_movie.rating }}</span>
-                    <span>{{ daily_movie.genres|join:" / " }}</span>
-                </div>
-                <div class="button-row">
-                    <a class="button primary" href="{% url 'movies:detail' daily_movie.pk %}">阅读今日电影</a>
-                    <a class="button" href="{% url 'ratings:category' %}">生成我的片单</a>
-                </div>
+            <p class="hero__summary">{{ daily_movie.summary|truncatechars:220 }}</p>
+            <div class="hero__actions">
+                <a class="btn btn--primary btn--lg" href="{% url 'movies:detail' daily_movie.pk %}">阅读今日电影</a>
+                <a class="btn btn--ghost btn--lg hero__ghost" href="{% url 'ratings:category' %}">生成我的片单</a>
             </div>
-        </article>
+        </div>
     {% else %}
-        <section class="page-heading">
-            <p class="kicker">Douban Top100</p>
-            <h1>暂时还没有可展示的电影数据。</h1>
-            <p class="lead">导入豆瓣 Top1000 数据后，这里会每天自动展示一部 Top100 电影。</p>
-        </section>
+        <div class="hero__content hero__content--empty">
+            <span class="hero__eyebrow">Douban Top100</span>
+            <h1 class="hero__title">暂时还没有可展示的电影数据</h1>
+            <p class="hero__summary">导入豆瓣 Top1000 数据后，这里会每天自动展示一部 Top100 电影。</p>
+        </div>
     {% endif %}
 </section>
 
-<section class="section-block movie-news-section" id="movie-news">
-    <div class="section-heading">
-        <p class="kicker">Douban Charts / Weekly Picks</p>
-        <h2>近期片讯</h2>
-    </div>
-
-    <section class="news-subsection douban-chart-section">
-        <div class="subsection-heading">
-            <h3>一周口碑榜</h3>
-            <p>每 7 天同步豆瓣一周口碑榜，展示当前口碑上升最快的前 6 部电影。</p>
-        </div>
+<section class="section" id="movie-news">
+    <div class="container">
+        <h2 class="section-title"><span class="section-title__eyebrow">Douban Weekly Picks</span>一周口碑榜</h2>
         {% if weekly_reputation_movies %}
-            <div class="douban-chart-list">
+            <div class="scroll-row scroll-row--6cols" role="list">
                 {% for item in weekly_reputation_movies %}
-                    <article class="card douban-chart-card">
-                        <a class="chart-poster" href="{{ item.subject_url }}" target="_blank" rel="noopener">
-                            {% if item.poster_url %}
-                                <img src="{% url 'blog:douban_weekly_reputation_poster' item.douban_id %}" alt="{{ item.title }} poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-                                <span class="poster-fallback is-hidden">{{ item.title }}</span>
-                            {% else %}
-                                <span class="poster-fallback">{{ item.title }}</span>
-                            {% endif %}
+                    <div class="scroll-row__item" role="listitem">
+                        <a class="movie-card" href="{% if item.local_movie %}{% url 'movies:detail' item.local_movie.pk %}{% else %}{% url 'blog:douban_weekly_reputation_detail' item.douban_id %}{% endif %}">
+                            <div class="movie-card__poster-wrap">
+                                {% if item.poster_url %}
+                                    <span class="poster-fallback movie-card__fallback">{{ item.title }}</span>
+                                    <img class="movie-card__poster" src="{% url 'blog:douban_weekly_reputation_poster' item.douban_id %}?v={{ item.updated_at|date:'U' }}" alt="{{ item.title }}海报" onerror="this.style.display='none'">
+                                {% else %}<span class="poster-fallback">{{ item.title }}</span>{% endif %}
+                                <span class="movie-card__rank">{{ item.rank }}</span>
+                            </div>
+                            <div class="movie-card__title">{{ item.title }}</div>
+                            <div class="movie-card__score">豆瓣 <span class="movie-card__score-num">{{ item.rating|default:"暂无" }}</span> · {{ item.rating_count }}人评价</div>
                         </a>
-                        <div class="chart-copy">
-                            <div class="chart-title-row">
-                                <span class="chart-rank">No.{{ item.rank }}</span>
-                                <h5>{{ item.title }}</h5>
-                            </div>
-                            {% if item.subtitle %}
-                                <p class="chart-subtitle">{{ item.subtitle }}</p>
-                            {% endif %}
-                            {% if item.info_text %}
-                                <p class="chart-info">{{ item.info_text|truncatechars:128 }}</p>
-                            {% endif %}
-                            <div class="chart-rating-row">
-                                {% if item.rating %}
-                                    <span class="score">豆瓣 {{ item.rating }}</span>
-                                {% endif %}
-                                <span>{{ item.rating_count }}人评价</span>
-                            </div>
-                            <a class="text-link" href="{{ item.subject_url }}" target="_blank" rel="noopener">查看详情</a>
-                        </div>
-                    </article>
+                    </div>
                 {% endfor %}
             </div>
-        {% else %}
-            <p class="meta">暂无一周口碑榜内容。运行 python manage.py sync_douban_weekly_reputation --force 后会自动更新。</p>
-        {% endif %}
-    </section>
-
-    <section class="news-subsection douban-chart-section">
-        <div class="subsection-heading">
-            <h3>豆瓣电影排行榜</h3>
-            <p>每 3 天同步豆瓣电影排行榜，展示当前榜单前 6 部电影的海报、片名、评分和评价人数。</p>
-        </div>
-        {% if douban_chart_movies %}
-            <div class="douban-chart-list">
-                {% for item in douban_chart_movies %}
-                    <article class="card douban-chart-card">
-                        <a class="chart-poster" href="{{ item.subject_url }}" target="_blank" rel="noopener">
-                            {% if item.poster_url %}
-                                <img src="{% url 'blog:douban_chart_poster' item.douban_id %}" alt="{{ item.title }} poster" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-                                <span class="poster-fallback is-hidden">{{ item.title }}</span>
-                            {% else %}
-                                <span class="poster-fallback">{{ item.title }}</span>
-                            {% endif %}
-                        </a>
-                        <div class="chart-copy">
-                            <div class="chart-title-row">
-                                <span class="chart-rank">No.{{ item.rank }}</span>
-                                <h5>{{ item.title }}</h5>
-                            </div>
-                            {% if item.subtitle %}
-                                <p class="chart-subtitle">{{ item.subtitle }}</p>
-                            {% endif %}
-                            {% if item.info_text %}
-                                <p class="chart-info">{{ item.info_text|truncatechars:128 }}</p>
-                            {% endif %}
-                            <div class="chart-rating-row">
-                                {% if item.rating %}
-                                    <span class="score">豆瓣 {{ item.rating }}</span>
-                                {% endif %}
-                                <span>{{ item.rating_count }}人评价</span>
-                            </div>
-                            <a class="text-link" href="{{ item.subject_url }}" target="_blank" rel="noopener">查看详情</a>
-                        </div>
-                    </article>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="meta">暂无豆瓣电影排行榜内容。运行 python manage.py sync_douban_chart --force 后会自动更新。</p>
-        {% endif %}
-    </section>
+        {% else %}<p class="empty-state">暂无一周口碑榜内容。</p>{% endif %}
+    </div>
 </section>
 
-<section class="section-block recommend-strip">
-    <div>
-        <p class="kicker">Personal Picks</p>
-        <h2>个性化推荐</h2>
-        <p>通过类型选择和 1-5 分评分，系统会从豆瓣 Top1000 数据中生成适合你的 Top20 片单。</p>
+<section class="section section--alt">
+    <div class="container">
+        <h2 class="section-title"><span class="section-title__eyebrow">Douban Charts</span>豆瓣电影排行榜</h2>
+        {% if douban_chart_movies %}
+            <div class="scroll-row scroll-row--6cols" role="list">
+                {% for item in douban_chart_movies %}
+                    <div class="scroll-row__item" role="listitem">
+                        <a class="movie-card" href="{% if item.local_movie %}{% url 'movies:detail' item.local_movie.pk %}{% else %}{% url 'blog:douban_chart_detail' item.douban_id %}{% endif %}">
+                            <div class="movie-card__poster-wrap">
+                                {% if item.poster_url %}
+                                    <span class="poster-fallback movie-card__fallback">{{ item.title }}</span>
+                                    <img class="movie-card__poster" src="{% url 'blog:douban_chart_poster' item.douban_id %}?v={{ item.updated_at|date:'U' }}" alt="{{ item.title }}海报" onerror="this.style.display='none'">
+                                {% else %}<span class="poster-fallback">{{ item.title }}</span>{% endif %}
+                                <span class="movie-card__rank">{{ item.rank }}</span>
+                            </div>
+                            <div class="movie-card__title">{{ item.title }}</div>
+                            <div class="movie-card__score">豆瓣 <span class="movie-card__score-num">{{ item.rating|default:"暂无" }}</span> · {{ item.rating_count }}人评价</div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}<p class="empty-state">暂无豆瓣电影排行榜内容。</p>{% endif %}
     </div>
-    <a class="button primary" href="{% url 'ratings:category' %}">开始推荐</a>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="cta-card">
+            <h2 class="cta-card__title">你的下一部好电影，<br>由你自己定义</h2>
+            <p class="cta-card__desc">从五种类型中选择喜欢的方向，为代表电影打分，系统会结合你的偏好生成专属 Top20 推荐片单。</p>
+            <div class="cta-card__actions">
+                <a class="btn btn--primary btn--lg cta-card__primary" href="{% url 'ratings:category' %}">开始推荐</a>
+                {% if user.is_authenticated %}<a class="btn btn--ghost btn--lg cta-card__secondary" href="{% url 'accounts:recommendation_history' %}">查看我的历史</a>{% else %}<a class="btn btn--ghost btn--lg cta-card__secondary" href="{% url 'accounts:login' %}">登录保存历史</a>{% endif %}
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}

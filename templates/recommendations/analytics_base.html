@@ -1,0 +1,13 @@
+{% load static %}
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}数据中心{% endblock %} — 电影资料馆</title><link rel="stylesheet" href="{% static 'css/analytics.css' %}?v=20260613"></head>
+<body><div class="admin-shell">
+<aside class="admin-sidebar" id="analytics-sidebar"><div class="admin-sidebar__logo"><a class="admin-sidebar__brand" href="{% url 'recommendations:center' %}">电影资料馆</a></div><nav class="admin-sidebar__nav">
+<div class="admin-nav-section"><div class="admin-nav-section__label">数据概览</div>
+<a class="admin-nav-item {% if active_page == 'recommendations' %}is-active{% endif %}" href="{% url 'recommendations:analytics' %}"><b class="nav-mark">R</b><span>推荐分析总览</span></a>
+<a class="admin-nav-item {% if active_page == 'users' %}is-active{% endif %}" href="{% url 'recommendations:user_analytics' %}"><b class="nav-mark">U</b><span>用户与会话</span></a>
+<a class="admin-nav-item {% if active_page == 'movies' %}is-active{% endif %}" href="{% url 'recommendations:movie_analytics' %}"><b class="nav-mark">M</b><span>电影内容</span></a>
+<a class="admin-nav-item {% if active_page == 'data_quality' %}is-active{% endif %}" href="{% url 'recommendations:data_quality' %}"><b class="nav-mark">Q</b><span>数据质量</span></a></div>
+<div class="admin-nav-section"><div class="admin-nav-section__label">管理</div><a class="admin-nav-item" href="{% url 'admin:index' %}"><b class="nav-mark">A</b><span>Django 管理后台</span></a><a class="admin-nav-item" href="{% url 'blog:home' %}"><b class="nav-mark">H</b><span>返回主站</span></a></div></nav></aside>
+<main class="admin-main"><header class="admin-topbar"><button class="mobile-menu" aria-label="打开导航" aria-expanded="false" aria-controls="analytics-sidebar">菜单</button><div class="admin-topbar__title">{% block page_title %}数据中心{% endblock %}</div><div class="admin-topbar__meta">最后更新：{{ updated_at|date:"Y-m-d H:i" }}</div></header>
+{% block filters %}{% endblock %}<div class="admin-content">{% if messages %}<div class="messages">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% block content %}{% endblock %}</div></main></div>
+<div class="chart-tooltip"></div>{% block chart_data %}{% endblock %}<script src="{% static 'js/analytics.js' %}?v=20260614"></script></body></html>

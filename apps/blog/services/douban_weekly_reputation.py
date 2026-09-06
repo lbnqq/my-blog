@@ -12,6 +12,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from apps.blog.models import DoubanWeeklyReputationMovie
+from apps.blog.services.poster_fetcher import fetch_douban_poster
 from apps.blog.services.douban_chart import clean_text, parse_decimal, parse_rating_count
 
 
@@ -249,7 +250,7 @@ def fetch_douban_chart_html():
 
 
 def fetch_url_with_curl(url, headers, timeout):
-    command = ["curl", "-L", "--max-time", str(timeout)]
+    command = ["curl", "-sS", "-L", "--max-time", str(timeout)]
     user_agent = headers.get("User-Agent")
     referer = headers.get("Referer")
     if user_agent:
@@ -297,17 +298,7 @@ def fetch_subject_html(subject_url):
 
 
 def fetch_douban_weekly_reputation_poster(movie):
-    request = urllib.request.Request(
-        movie.poster_url,
-        headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/125 Safari/537.36",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "Referer": movie.subject_url,
-        },
-    )
-    with urllib.request.urlopen(request, timeout=15) as response:
-        content_type = response.headers.get("Content-Type", "image/jpeg").split(";")[0]
-        return response.read(), content_type
+    return fetch_douban_poster(movie.poster_url, movie.subject_url)
 
 
 def get_homepage_weekly_reputation(limit=6):
@@ -332,6 +323,20 @@ def sync_douban_weekly_reputation(
     try:
         entries = parse_weekly_reputation_chart(fetch_chart_html(), limit=6)
     except (OSError, urllib.error.URLError, urllib.error.HTTPError, TimeoutError) as exc:
+        cached_count = DoubanWeeklyReputationMovie.objects.filter(is_active=True).count()
+        cache_is_recent = latest_fetch and timezone.now() - latest_fetch < SYNC_INTERVAL
+        if cached_count and cache_is_recent:
+            return WeeklyReputationSyncResult(
+                "skipped",
+                0,
+                f"豆瓣暂时无法连接，继续使用现有 {cached_count} 条缓存口碑榜数据。网络原因：{exc}",
+            )
+        if cached_count:
+            return WeeklyReputationSyncResult(
+                "failed",
+                0,
+                f"豆瓣同步失败，现有 {cached_count} 条口碑榜缓存已过期但仍保留。网络原因：{exc}",
+            )
         return WeeklyReputationSyncResult("failed", 0, f"Failed to fetch Douban weekly reputation chart: {exc}")
 
     if not entries:

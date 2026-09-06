@@ -1,0 +1,8 @@
+{% extends "recommendations/analytics_base.html" %}{% block title %}数据统计{% endblock %}{% block page_title %}数据中心{% endblock %}
+{% block content %}<section class="overview-hero"><div class="overview-hero__eyebrow">管理后台 · 数据统计</div><h1>电影资料馆 数据中心</h1><p>使用真实业务数据监控推荐效果、用户行为、电影内容和数据质量。</p></section>
+<section class="nav-grid">
+<a class="nav-card" href="{% url 'recommendations:analytics' %}"><div class="nav-card__stat">推荐</div><h2>推荐分析总览</h2><p>查看推荐会话、反馈覆盖、排名效果和算法版本表现。</p><span class="tag">进入分析</span></a>
+<a class="nav-card" href="{% url 'recommendations:user_analytics' %}"><div class="nav-card__stat">用户</div><h2>用户与会话分析</h2><p>追踪登录用户、游客会话、评分行为与回访情况。</p><span class="tag">进入分析</span></a>
+<a class="nav-card" href="{% url 'recommendations:movie_analytics' %}"><div class="nav-card__stat">{{ movie_count }}</div><h2>电影内容与推荐表现</h2><p>分析电影覆盖、满意度、年份与内容多样性。</p><span class="tag">进入分析</span></a>
+<a class="nav-card" href="{% url 'recommendations:data_quality' %}"><div class="nav-card__stat">{{ chart_count|add:weekly_count }}</div><h2>数据质量与同步状态</h2><p>检查榜单、口碑榜、片讯、评分表和电影字段完整性。</p><span class="tag">进入分析</span></a>
+</section>{% endblock %}

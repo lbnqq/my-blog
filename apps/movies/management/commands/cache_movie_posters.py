@@ -1,8 +1,6 @@
-import urllib.error
-import urllib.request
-
 from django.core.management.base import BaseCommand
 
+from apps.blog.services.poster_fetcher import fetch_douban_poster
 from apps.movies.models import Movie
 from apps.movies.templatetags.movie_posters import poster_cache_path
 
@@ -36,7 +34,7 @@ class Command(BaseCommand):
 
             try:
                 self.download(movie.poster_url, target_path)
-            except (OSError, urllib.error.URLError, urllib.error.HTTPError) as exc:
+            except (OSError, TimeoutError) as exc:
                 failed += 1
                 self.stderr.write(f"Failed {movie.title}: {exc}")
                 continue
@@ -52,12 +50,5 @@ class Command(BaseCommand):
 
     def download(self, url, target_path):
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        request = urllib.request.Request(
-            url,
-            headers={
-                "User-Agent": "Mozilla/5.0 (compatible; MovieBlogPosterCache/1.0)",
-                "Referer": "https://movie.douban.com/",
-            },
-        )
-        with urllib.request.urlopen(request, timeout=15) as response:
-            target_path.write_bytes(response.read())
+        content, _ = fetch_douban_poster(url, "https://movie.douban.com/")
+        target_path.write_bytes(content)
